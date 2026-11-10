@@ -1,0 +1,778 @@
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 1
+
+
+
+
+
+       MCS-51 Family Macro Assembler   A S E M - 5 1   V 1.3
+       =====================================================
+
+
+
+	Source File:	C:\Users\HP\Documents\Kuliah\SMT 5\Praktikum SIstem Mikroprosesor\Tugas Besar\Firmware\AT89S52_Code_Dasar.asm
+	Object File:	C:\Users\HP\Documents\Kuliah\SMT 5\Praktikum SIstem Mikroprosesor\Tugas Besar\Firmware\AT89S52_Code_Dasar.hex
+	List File:	C:\Users\HP\Documents\Kuliah\SMT 5\Praktikum SIstem Mikroprosesor\Tugas Besar\Firmware\AT89S52_Code_Dasar.lst
+
+
+
+ Line  I  Addr  Code            Source
+
+    1:				; =================================================================
+    2:				; BASIC CALCULATOR 8051 (REFINED VERSION)
+    3:				; Fitur:
+    4:				; - Operator langsung tampil setelah angka pertama (Augend)
+    5:				; - Tombol R4 C1 berfungsi penuh sebagai ON/C (Clear/Reset All)
+    6:				; =================================================================
+    7:
+    8:				; --- DEKLARASI PIN I/O & FLAG ---
+    9:		B      00A1	RS          EQU P2.1    ; RS pada LCD
+   10:		B      00A2	EN          EQU P2.2    ; EN pada LCD
+   11:		B      00A7	NOVONUM     EQU P2.7    ; P2.7 HIGH saat menulis angka kedua
+   12:		B      00A6	NOVODIG     EQU P2.6    ; P2.6 HIGH saat digit pertama sudah ditulis
+   13:
+   14:		N      0000	    ORG 00H
+   15:	  0000	01 40		    AJMP START
+   16:
+   17:		N      0040	    ORG 40H
+   18:	  0040			START:
+   19:	  0040	51 BB		    ACALL INITIALYZE
+   20:	  0042	80 00		    SJMP L1             ; Langsung mulai scanning keypad
+   21:
+   22:				; =================================================================
+   23:				; KEYPAD SCANNING (4x4 Matrix)
+   24:				; =================================================================
+   25:	  0044			L1:
+   26:	  0044	30 B0 0B	    JNB P3.0, C1
+   27:	  0047	30 B1 1A	    JNB P3.1, C2
+   28:	  004A	30 B2 29	    JNB P3.2, C3
+   29:	  004D	30 B3 38	    JNB P3.3, C4
+   30:	  0050	80 F2		    SJMP L1
+   31:
+   32:	  0052			C1: ; SCANNING KOLOM 1
+   33:	  0052	30 B4 5B	    JNB P3.4, JUMP_TO_7
+   34:	  0055	30 B5 4F	    JNB P3.5, JUMP_TO_4
+   35:	  0058	30 B6 43	    JNB P3.6, JUMP_TO_1
+   36:	  005B	30 B7 6A	    JNB P3.7, JUMP_RFRESH   ; <-- Tombol R4 C1 (ON/C) untuk RESET
+   37:	  005E	D2 B0		    SETB P3.0
+   38:	  0060	C2 B1		    CLR P3.1
+   39:	  0062	80 E0		    SJMP L1
+   40:
+   41:	  0064			C2: ; SCANNING KOLOM 2
+   42:	  0064	30 B4 4C	    JNB P3.4, JUMP_TO_8
+   43:	  0067	30 B5 40	    JNB P3.5, JUMP_TO_5
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 2
+
+
+
+ Line  I  Addr  Code            Source
+
+   44:	  006A	30 B6 34	    JNB P3.6, JUMP_TO_2
+   45:	  006D	30 B7 2B	    JNB P3.7, JUMP_TO_0
+   46:	  0070	D2 B1		    SETB P3.1
+   47:	  0072	C2 B2		    CLR P3.2
+   48:	  0074	80 CE		    SJMP L1
+   49:
+   50:	  0076			C3: ; SCANNING KOLOM 3
+   51:	  0076	30 B4 3D	    JNB P3.4, JUMP_TO_9
+   52:	  0079	30 B5 31	    JNB P3.5, JUMP_TO_6
+   53:	  007C	30 B6 25	    JNB P3.6, JUMP_TO_3
+   54:	  007F	30 B7 43	    JNB P3.7, JUMP_EQUAL
+   55:	  0082	D2 B2		    SETB P3.2
+   56:	  0084	C2 B3		    CLR P3.3
+   57:	  0086	80 BC		    SJMP L1
+   58:
+   59:	  0088			C4: ; SCANNING KOLOM 4
+   60:	  0088	30 B4 37	    JNB P3.4, JUMP_DIVIDE
+   61:	  008B	30 B5 31	    JNB P3.5, JUMP_MULTI
+   62:	  008E	30 B6 2B	    JNB P3.6, JUMP_MINUS
+   63:	  0091	30 B7 25	    JNB P3.7, JUMP_PLUS
+   64:	  0094	D2 B3		    SETB P3.3
+   65:	  0096	C2 B0		    CLR P3.0
+   66:	  0098	02 00 44	    LJMP L1
+   67:
+   68:				; --- PENGALIHAN JUMP (OUT OF RANGE RELATIVE JUMP FIX) ---
+   69:	  009B	02 00 E1	JUMP_TO_0:  LJMP NUM_0
+   70:	  009E	02 00 ED	JUMP_TO_1:  LJMP NUM_1
+   71:	  00A1	02 00 F9	JUMP_TO_2:  LJMP NUM_2
+   72:	  00A4	02 01 05	JUMP_TO_3:  LJMP NUM_3
+   73:	  00A7	02 01 11	JUMP_TO_4:  LJMP NUM_4
+   74:	  00AA	02 01 1D	JUMP_TO_5:  LJMP NUM_5
+   75:	  00AD	02 01 29	JUMP_TO_6:  LJMP NUM_6
+   76:	  00B0	02 01 35	JUMP_TO_7:  LJMP NUM_7
+   77:	  00B3	02 01 41	JUMP_TO_8:  LJMP NUM_8
+   78:	  00B6	02 01 4D	JUMP_TO_9:  LJMP NUM_9
+   79:
+   80:	  00B9	02 01 65	JUMP_PLUS:  LJMP ADD_FUNC
+   81:	  00BC	02 01 71	JUMP_MINUS: LJMP SUB_FUNC
+   82:	  00BF	02 01 7D	JUMP_MULTI: LJMP MUL_FUNC
+   83:	  00C2	02 01 89	JUMP_DIVIDE:LJMP DIV_FUNC
+   84:	  00C5	02 01 59	JUMP_EQUAL: LJMP EQU_FUNC
+   85:
+   86:				; =================================================================
+   87:				; FUNGSI RESET / CLEAR (ON/C)
+   88:				; =================================================================
+   89:	  00C8			JUMP_RFRESH:
+   90:	  00C8	78 01		    MOV R0, #01H        ; Command Clear LCD
+   91:	  00CA	51 B0		    ACALL COMMAND
+   92:
+   93:				    ; Reset seluruh nilai register dan state
+   94:	  00CC	79 00		    MOV R1, #00H        ; Reset Angka 1
+   95:	  00CE	7A 00		    MOV R2, #00H        ; Reset Operator
+   96:	  00D0	7B 00		    MOV R3, #00H        ; Reset Angka 2
+   97:	  00D2	7C 00		    MOV R4, #00H        ; Reset Hasil / Temp
+   98:	  00D4	7D 00		    MOV R5, #00H        ; Reset Sisa Bagi
+   99:	  00D6	7E 00		    MOV R6, #00H
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 3
+
+
+
+ Line  I  Addr  Code            Source
+
+  100:	  00D8	7F 00		    MOV R7, #00H
+  101:	  00DA	C2 A7		    CLR NOVONUM         ; Kembalikan flag ke input angka pertama
+  102:	  00DC	C2 A6		    CLR NOVODIG         ; Kembalikan flag digit baru
+  103:	  00DE	02 00 44	    LJMP L1
+  104:
+  105:				; =================================================================
+  106:				; INPUT ANGKA (0-9)
+  107:				; =================================================================
+  108:	  00E1	30 B7 FD	NUM_0: JNB P3.7, NUM_0
+  109:	  00E4	78 30		       MOV R0, #'0'
+  110:	  00E6	31 9C		       ACALL ASCII_2_DEC
+  111:	  00E8	51 A5		       ACALL DISPLAY
+  112:	  00EA	02 00 44	       LJMP L1
+  113:
+  114:	  00ED	30 B6 FD	NUM_1: JNB P3.6, NUM_1
+  115:	  00F0	78 31		       MOV R0, #'1'
+  116:	  00F2	31 9C		       ACALL ASCII_2_DEC
+  117:	  00F4	51 A5		       ACALL DISPLAY
+  118:	  00F6	02 00 44	       LJMP L1
+  119:
+  120:	  00F9	30 B6 FD	NUM_2: JNB P3.6, NUM_2
+  121:	  00FC	78 32		       MOV R0, #'2'
+  122:	  00FE	31 9C		       ACALL ASCII_2_DEC
+  123:	  0100	51 A5		       ACALL DISPLAY
+  124:	  0102	02 00 44	       LJMP L1
+  125:
+  126:	  0105	30 B6 FD	NUM_3: JNB P3.6, NUM_3
+  127:	  0108	78 33		       MOV R0, #'3'
+  128:	  010A	31 9C		       ACALL ASCII_2_DEC
+  129:	  010C	51 A5		       ACALL DISPLAY
+  130:	  010E	02 00 44	       LJMP L1
+  131:
+  132:	  0111	30 B5 FD	NUM_4: JNB P3.5, NUM_4
+  133:	  0114	78 34		       MOV R0, #'4'
+  134:	  0116	31 9C		       ACALL ASCII_2_DEC
+  135:	  0118	51 A5		       ACALL DISPLAY
+  136:	  011A	02 00 44	       LJMP L1
+  137:
+  138:	  011D	30 B5 FD	NUM_5: JNB P3.5, NUM_5
+  139:	  0120	78 35		       MOV R0, #'5'
+  140:	  0122	31 9C		       ACALL ASCII_2_DEC
+  141:	  0124	51 A5		       ACALL DISPLAY
+  142:	  0126	02 00 44	       LJMP L1
+  143:
+  144:	  0129	30 B5 FD	NUM_6: JNB P3.5, NUM_6
+  145:	  012C	78 36		       MOV R0, #'6'
+  146:	  012E	31 9C		       ACALL ASCII_2_DEC
+  147:	  0130	51 A5		       ACALL DISPLAY
+  148:	  0132	02 00 44	       LJMP L1
+  149:
+  150:	  0135	30 B4 FD	NUM_7: JNB P3.4, NUM_7
+  151:	  0138	78 37		       MOV R0, #'7'
+  152:	  013A	31 9C		       ACALL ASCII_2_DEC
+  153:	  013C	51 A5		       ACALL DISPLAY
+  154:	  013E	02 00 44	       LJMP L1
+  155:
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 4
+
+
+
+ Line  I  Addr  Code            Source
+
+  156:	  0141	30 B4 FD	NUM_8: JNB P3.4, NUM_8
+  157:	  0144	78 38		       MOV R0, #'8'
+  158:	  0146	31 9C		       ACALL ASCII_2_DEC
+  159:	  0148	51 A5		       ACALL DISPLAY
+  160:	  014A	02 00 44	       LJMP L1
+  161:
+  162:	  014D	30 B4 FD	NUM_9: JNB P3.4, NUM_9
+  163:	  0150	78 39		       MOV R0, #'9'
+  164:	  0152	31 9C		       ACALL ASCII_2_DEC
+  165:	  0154	51 A5		       ACALL DISPLAY
+  166:	  0156	02 00 44	       LJMP L1
+  167:
+  168:				; =================================================================
+  169:				; INPUT OPERATOR & SAMA DENGAN
+  170:				; =================================================================
+  171:	  0159			EQU_FUNC:
+  172:	  0159	30 B7 FD	    JNB P3.7, EQU_FUNC
+  173:	  015C	78 3D		    MOV R0, #'='
+  174:	  015E	51 A5		    ACALL DISPLAY
+  175:	  0160	31 E0		    ACALL RESULT
+  176:	  0162	02 00 44	    LJMP L1
+  177:
+  178:	  0165			ADD_FUNC:
+  179:	  0165	30 B7 FD	    JNB P3.7, ADD_FUNC
+  180:	  0168	78 2B		    MOV R0, #'+'
+  181:	  016A	31 95		    ACALL OPERATOR
+  182:	  016C	51 A5		    ACALL DISPLAY       ; Langsung tampilkan '+' setelah angka 1
+  183:	  016E	02 00 44	    LJMP L1
+  184:
+  185:	  0171			SUB_FUNC:
+  186:	  0171	30 B6 FD	    JNB P3.6, SUB_FUNC
+  187:	  0174	78 2D		    MOV R0, #'-'
+  188:	  0176	31 95		    ACALL OPERATOR
+  189:	  0178	51 A5		    ACALL DISPLAY       ; Langsung tampilkan '-' setelah angka 1
+  190:	  017A	02 00 44	    LJMP L1
+  191:
+  192:	  017D			MUL_FUNC:
+  193:	  017D	30 B5 FD	    JNB P3.5, MUL_FUNC
+  194:	  0180	78 2A		    MOV R0, #'*'
+  195:	  0182	31 95		    ACALL OPERATOR
+  196:	  0184	51 A5		    ACALL DISPLAY       ; Langsung tampilkan '*' setelah angka 1
+  197:	  0186	02 00 44	    LJMP L1
+  198:
+  199:	  0189			DIV_FUNC:
+  200:	  0189	30 B4 FD	    JNB P3.4, DIV_FUNC
+  201:	  018C	78 2F		    MOV R0, #'/'
+  202:	  018E	31 95		    ACALL OPERATOR
+  203:	  0190	51 A5		    ACALL DISPLAY       ; Langsung tampilkan '/' setelah angka 1
+  204:	  0192	02 00 44	    LJMP L1
+  205:
+  206:	  0195			OPERATOR:
+  207:	  0195	D2 A7		    SETB NOVONUM        ; Aktifkan state untuk menerima Angka Ke-2
+  208:	  0197	C2 A6		    CLR NOVODIG         ; Reset flag digit untuk angka baru
+  209:	  0199	E8		    MOV A, R0
+  210:	  019A	FA		    MOV R2, A           ; Simpan tipe operator di R2
+  211:	  019B	22		    RET
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 5
+
+
+
+ Line  I  Addr  Code            Source
+
+  212:
+  213:				; =================================================================
+  214:				; KONVERSI ASCII KE DECIMAL (PENYIMPANAN NILAI)
+  215:				; =================================================================
+  216:	  019C			ASCII_2_DEC:
+  217:	  019C	20 A7 1F	    JB NOVONUM, SECOND_NUMBER   ; Jika state angka ke-2, lompat
+  218:	  019F	20 A6 07	    JB NOVODIG, NEW_DIGIT       ; Jika bukan digit pertama angka ke-1, lompat
+  219:
+  220:				    ; Simpan digit pertama dari angka pertama
+  221:	  01A2	E8		    MOV A, R0
+  222:	  01A3	94 30		    SUBB A, #30H
+  223:	  01A5	F9		    MOV R1, A           ; Nilai masuk ke R1
+  224:	  01A6	D2 A6		    SETB NOVODIG        ; Tandai digit pertama sudah masuk
+  225:	  01A8	22		    RET
+  226:
+  227:	  01A9			NEW_DIGIT:
+  228:	  01A9	E8		    MOV A, R0
+  229:	  01AA	75 F0 0A	    MOV B, #10D
+  230:	  01AD	94 30		    SUBB A, #30H
+  231:	  01AF	FF		    MOV R7, A
+  232:	  01B0	E9		    MOV A, R1
+  233:	  01B1	A4		    MUL AB              ; R1 * 10
+  234:	  01B2	AE F0		    MOV R6, B
+  235:	  01B4	BE 00 26	    CJNE R6, #00H, JUMP_BURST
+  236:	  01B7	2F		    ADD A, R7
+  237:	  01B8	40 23		    JC JUMP_BURST
+  238:	  01BA	F9		    MOV R1, A           ; Update R1 dengan gabungan digit
+  239:	  01BB	D2 A6		    SETB NOVODIG
+  240:	  01BD	22		    RET
+  241:
+  242:	  01BE			SECOND_NUMBER:
+  243:	  01BE	20 A6 07	    JB NOVODIG, NOVODIGITO2
+  244:
+  245:				    ; Simpan digit pertama dari angka kedua
+  246:	  01C1	E8		    MOV A, R0
+  247:	  01C2	94 30		    SUBB A, #30H
+  248:	  01C4	FB		    MOV R3, A           ; Nilai masuk ke R3
+  249:	  01C5	D2 A6		    SETB NOVODIG
+  250:	  01C7	22		    RET
+  251:
+  252:	  01C8			NOVODIGITO2:
+  253:	  01C8	E8		    MOV A, R0
+  254:	  01C9	75 F0 0A	    MOV B, #10D
+  255:	  01CC	94 30		    SUBB A, #30H
+  256:	  01CE	FF		    MOV R7, A
+  257:	  01CF	EB		    MOV A, R3
+  258:	  01D0	A4		    MUL AB              ; R3 * 10
+  259:	  01D1	AE F0		    MOV R6, B
+  260:	  01D3	BE 00 07	    CJNE R6, #00H, JUMP_BURST
+  261:	  01D6	2F		    ADD A, R7
+  262:	  01D7	40 04		    JC JUMP_BURST
+  263:	  01D9	FB		    MOV R3, A           ; Update R3 dengan gabungan digit
+  264:	  01DA	D2 A6		    SETB NOVODIG
+  265:	  01DC	22		    RET
+  266:
+  267:	  01DD			JUMP_BURST:
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 6
+
+
+
+ Line  I  Addr  Code            Source
+
+  268:	  01DD	02 02 31	    LJMP ERRORS
+  269:
+  270:				; =================================================================
+  271:				; KALKULASI HASIL (RESULT)
+  272:				; =================================================================
+  273:	  01E0			RESULT:
+  274:	  01E0			ADD_BYTES:
+  275:	  01E0	BA 2B 0B	    CJNE R2, #'+', SUB_BYTES
+  276:	  01E3	E9		    MOV A, R1
+  277:	  01E4	C3		    CLR C
+  278:	  01E5	2B		    ADD A, R3
+  279:	  01E6	40 F5		    JC JUMP_BURST
+  280:	  01E8	7D 00		    MOV R5, #0H
+  281:	  01EA	FC		    MOV R4, A
+  282:	  01EB	02 02 18	    LJMP TO_PRINT
+  283:
+  284:	  01EE			SUB_BYTES:
+  285:	  01EE	BA 2D 0B	    CJNE R2, #'-', MUL_BYTES
+  286:	  01F1	E9		    MOV A, R1
+  287:	  01F2	C3		    CLR C
+  288:	  01F3	9B		    SUBB A, R3
+  289:	  01F4	40 E7		    JC JUMP_BURST
+  290:	  01F6	7D 00		    MOV R5, #0H
+  291:	  01F8	FC		    MOV R4, A
+  292:	  01F9	02 02 18	    LJMP TO_PRINT
+  293:
+  294:	  01FC			MUL_BYTES:
+  295:	  01FC	BA 2A 0F	    CJNE R2, #'*', DIV_BYTES
+  296:	  01FF	E9		    MOV A, R1
+  297:	  0200	8B F0		    MOV B, R3
+  298:	  0202	A4		    MUL AB
+  299:	  0203	AF F0		    MOV R7, B
+  300:	  0205	BF 00 29	    CJNE R7, #0H, ERRORS
+  301:	  0208	7D 00		    MOV R5, #0H
+  302:	  020A	FC		    MOV R4, A
+  303:	  020B	02 02 18	    LJMP TO_PRINT
+  304:
+  305:	  020E			DIV_BYTES:
+  306:	  020E	E9		    MOV A, R1
+  307:	  020F	8B F0		    MOV B, R3
+  308:	  0211	84		    DIV AB
+  309:	  0212	FC		    MOV R4, A           ; R4 menyimpan hasil bagi
+  310:	  0213	AD F0		    MOV R5, B           ; R5 menyimpan sisa bagi (modulus)
+  311:	  0215	02 02 18	    LJMP TO_PRINT
+  312:
+  313:				; =================================================================
+  314:				; CETAK HASIL KE LCD
+  315:				; =================================================================
+  316:	  0218			TO_PRINT:
+  317:	  0218	BB 00 2B	    CJNE R3, #0D, NORMAL
+  318:	  021B	BA 2F 28	    CJNE R2, #'/', NORMAL
+  319:				    ; Jika Pembagian dengan 0
+  320:	  021E	78 C0		    MOV R0, #0C0H
+  321:	  0220	51 B0		    ACALL COMMAND
+  322:	  0222	90 03 25	    MOV DPTR, #MSG_ERR_0
+  323:	  0225	C3		    CLR C
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 7
+
+
+
+ Line  I  Addr  Code            Source
+
+  324:	  0226	7F 00		    MOV R7, #0D
+  325:	  0228			PROX:
+  326:	  0228	EF		    MOV A, R7
+  327:	  0229	93		    MOVC A, @A+DPTR
+  328:	  022A	F8		    MOV R0, A
+  329:	  022B	51 A5		    ACALL DISPLAY
+  330:	  022D	0F		    INC R7
+  331:	  022E	70 F8		    JNZ PROX
+  332:	  0230	22		    RET
+  333:
+  334:	  0231			ERRORS:
+  335:	  0231	78 C0		    MOV R0, #0C0H
+  336:	  0233	51 B0		    ACALL COMMAND
+  337:	  0235	90 03 35	    MOV DPTR, #MSG_ERR_1
+  338:	  0238	C3		    CLR C
+  339:	  0239	7F 00		    MOV R7, #0D
+  340:	  023B			PROX2:
+  341:	  023B	EF		    MOV A, R7
+  342:	  023C	93		    MOVC A, @A+DPTR
+  343:	  023D	F8		    MOV R0, A
+  344:	  023E	51 A5		    ACALL DISPLAY
+  345:	  0240	60 03		    JZ FIM
+  346:	  0242	0F		    INC R7
+  347:	  0243	80 F6		    SJMP PROX2
+  348:	  0245			FIM:
+  349:	  0245	22		    RET
+  350:
+  351:	  0246			NORMAL:
+  352:	  0246	7F 64		    MOV R7, #100D
+  353:	  0248	C3		    CLR C
+  354:	  0249	9F		    SUBB A, R7
+  355:	  024A	40 22		    JC MENOR100
+  356:	  024C	EC		    MOV A, R4
+  357:	  024D	8F F0		    MOV B, R7
+  358:	  024F	84		    DIV AB
+  359:	  0250	24 30		    ADD A, #30H
+  360:	  0252	F8		    MOV R0, A
+  361:	  0253	51 A5		    ACALL DISPLAY       ; Cetak Ratusan
+  362:	  0255	AC F0		    MOV R4, B
+  363:	  0257	E5 F0		    MOV A, B
+  364:	  0259	7F 0A		    MOV R7, #10D
+  365:	  025B	8F F0		    MOV B, R7
+  366:	  025D	84		    DIV AB
+  367:	  025E	24 30		    ADD A, #30H
+  368:	  0260	F8		    MOV R0, A
+  369:	  0261	51 A5		    ACALL DISPLAY       ; Cetak Puluhan
+  370:	  0263	E5 F0		    MOV A, B
+  371:	  0265	24 30		    ADD A, #30H
+  372:	  0267	F8		    MOV R0, A
+  373:	  0268	51 A5		    ACALL DISPLAY       ; Cetak Satuan
+  374:	  026A	BD 00 26	    CJNE R5, #00H, DECIMAL
+  375:	  026D	22		    RET
+  376:
+  377:	  026E			MENOR100:
+  378:	  026E	7F 0A		    MOV R7, #10D
+  379:	  0270	C3		    CLR C
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 8
+
+
+
+ Line  I  Addr  Code            Source
+
+  380:	  0271	EC		    MOV A, R4
+  381:	  0272	9F		    SUBB A, R7
+  382:	  0273	40 14		    JC MENOR10
+  383:	  0275	EC		    MOV A, R4
+  384:	  0276	8F F0		    MOV B, R7
+  385:	  0278	84		    DIV AB
+  386:	  0279	24 30		    ADD A, #30H
+  387:	  027B	F8		    MOV R0, A
+  388:	  027C	51 A5		    ACALL DISPLAY       ; Cetak Puluhan
+  389:	  027E	E5 F0		    MOV A, B
+  390:	  0280	24 30		    ADD A, #30H
+  391:	  0282	F8		    MOV R0, A
+  392:	  0283	51 A5		    ACALL DISPLAY       ; Cetak Satuan
+  393:	  0285	BD 00 0B	    CJNE R5, #00H, DECIMAL
+  394:	  0288	22		    RET
+  395:
+  396:	  0289			MENOR10:
+  397:	  0289	EC		    MOV A, R4
+  398:	  028A	24 30		    ADD A, #30H
+  399:	  028C	F8		    MOV R0, A
+  400:	  028D	51 A5		    ACALL DISPLAY       ; Cetak Satuan
+  401:	  028F	BD 00 01	    CJNE R5, #00H, DECIMAL
+  402:	  0292	22		    RET
+  403:
+  404:	  0293			DECIMAL:
+  405:	  0293	78 2E		    MOV R0, #'.'
+  406:	  0295	51 A5		    ACALL DISPLAY
+  407:	  0297	ED		    MOV A, R5
+  408:	  0298	75 F0 0A	    MOV B, #10D
+  409:	  029B	A4		    MUL AB
+  410:	  029C	8B F0		    MOV B, R3
+  411:	  029E	84		    DIV AB
+  412:	  029F	24 30		    ADD A, #30H
+  413:	  02A1	F8		    MOV R0, A
+  414:	  02A2	51 A5		    ACALL DISPLAY       ; Cetak angka di belakang koma
+  415:	  02A4	22		    RET
+  416:
+  417:				; =================================================================
+  418:				; DRIVER LCD
+  419:				; =================================================================
+  420:	  02A5			DISPLAY:
+  421:	  02A5	88 80		    MOV P0, R0
+  422:	  02A7	D2 A1		    SETB RS
+  423:	  02A9	D2 A2		    SETB EN
+  424:	  02AB	71 01		    ACALL DELAY
+  425:	  02AD	C2 A2		    CLR EN
+  426:	  02AF	22		    RET
+  427:
+  428:	  02B0			COMMAND:
+  429:	  02B0	88 80		    MOV P0, R0
+  430:	  02B2	C2 A1		    CLR RS
+  431:	  02B4	D2 A2		    SETB EN
+  432:	  02B6	71 01		    ACALL DELAY
+  433:	  02B8	C2 A2		    CLR EN
+  434:	  02BA	22		    RET
+  435:
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 9
+
+
+
+ Line  I  Addr  Code            Source
+
+  436:				; =================================================================
+  437:				; INITIALIZATION & DELAY
+  438:				; =================================================================
+  439:	  02BB			INITIALYZE:
+  440:	  02BB	E4		    CLR A
+  441:	  02BC	F8		    MOV R0, A
+  442:	  02BD	F9		    MOV R1, A
+  443:	  02BE	FA		    MOV R2, A
+  444:	  02BF	FB		    MOV R3, A
+  445:	  02C0	FC		    MOV R4, A
+  446:	  02C1	FD		    MOV R5, A
+  447:	  02C2	FE		    MOV R6, A
+  448:	  02C3	FF		    MOV R7, A
+  449:	  02C4	F5 80		    MOV P0, A
+  450:	  02C6	F5 90		    MOV P1, A
+  451:	  02C8	F5 A0		    MOV P2, A
+  452:	  02CA	75 B0 FE	    MOV P3, #0FEH
+  453:
+  454:	  02CD			LCD_INIT:
+  455:	  02CD	78 38		    MOV R0,#38H
+  456:	  02CF	51 B0		    ACALL COMMAND
+  457:	  02D1	78 0E		    MOV R0,#0EH
+  458:	  02D3	51 B0		    ACALL COMMAND
+  459:	  02D5	78 01		    MOV R0,#01H
+  460:	  02D7	51 B0		    ACALL COMMAND
+  461:	  02D9	74 06		    MOV A,#06H
+  462:	  02DB	51 B0		    ACALL COMMAND
+  463:	  02DD	78 80		    MOV R0,#80H
+  464:	  02DF	51 B0		    ACALL COMMAND
+  465:	  02E1	74 3C		    MOV A,#3CH
+  466:	  02E3	51 B0		    ACALL COMMAND
+  467:
+  468:	  02E5			STARTUP_MSG:
+  469:	  02E5	78 01		    MOV R0, #01H
+  470:	  02E7	51 B0		    ACALL COMMAND
+  471:	  02E9	90 03 14	    MOV DPTR, #MSG_START
+  472:	  02EC			DO_LOOP1:
+  473:	  02EC	E4		    CLR A
+  474:	  02ED	93		    MOVC A, @A+DPTR
+  475:	  02EE	F8		    MOV R0, A
+  476:	  02EF	60 07		    JZ EXIT1
+  477:	  02F1	51 A5		    ACALL DISPLAY
+  478:	  02F3	71 01		    ACALL DELAY
+  479:	  02F5	A3		    INC DPTR
+  480:	  02F6	80 F4		    SJMP DO_LOOP1
+  481:	  02F8			EXIT1:
+  482:	  02F8	71 01		    ACALL DELAY
+  483:	  02FA	71 01		    ACALL DELAY
+  484:	  02FC	78 01		    MOV R0, #01H
+  485:	  02FE	51 B0		    ACALL COMMAND           ; Bersihkan layar setelah splash screen
+  486:	  0300	22		    RET
+  487:
+  488:	  0301	75 3E 02	DELAY:  MOV 62, #2          ; APPROX DELAY DE 0.25s
+  489:	  0304	75 3D 64	DELAY1: MOV 61, #100
+  490:	  0307	75 3C FA	DELAY2: MOV 60, #250
+  491:	  030A	D5 3C FD	        DJNZ 60, $
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 10
+
+
+
+ Line  I  Addr  Code            Source
+
+  492:	  030D	D5 3D F7	        DJNZ 61, DELAY2
+  493:	  0310	D5 3E F1	        DJNZ 62, DELAY1
+  494:	  0313	22		        RET
+  495:
+  496:				; =================================================================
+  497:				; DATA STRING MESSAGE
+  498:				; =================================================================
+  499:	  0314	42 41 53 49	MSG_START: DB 'BASIC CALCULATOR',0
+	  0318	43 20 43 41
+	  031C	4C 43 55 4C
+	  0320	41 54 4F 52
+	  0324	00
+  500:	  0325	45 52 52 4F	MSG_ERR_0: DB 'ERROR: DIV BY 0',0
+	  0329	52 3A 20 44
+	  032D	49 56 20 42
+	  0331	59 20 30 00
+  501:	  0335	4F 56 45 52	MSG_ERR_1: DB 'OVERFLOW!',0
+	  0339	46 4C 4F 57
+	  033D	21 00
+  502:
+  503:				END
+
+
+
+
+
+                     register banks used:  ---
+
+                     no errors
+
+
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 11
+
+
+
+
+
+	       L I S T   O F   S Y M B O L S
+	       =============================
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+??ASEM_51			  NUMBER    8051
+??VERSION			  NUMBER    0130
+AC				  BIT	      D6
+ACC				  DATA	      E0
+ADD_BYTES			  CODE	    01E0	 274
+ADD_FUNC			  CODE	    0165	 178
+ASCII_2_DEC			  CODE	    019C	 216
+B				  DATA	      F0
+C1				  CODE	    0052	  32
+C2				  CODE	    0064	  41
+C3				  CODE	    0076	  50
+C4				  CODE	    0088	  59
+COMMAND				  CODE	    02B0	 428
+CY				  BIT	      D7
+DECIMAL				  CODE	    0293	 404
+DELAY				  CODE	    0301	 488
+DELAY1				  CODE	    0304	 489
+DELAY2				  CODE	    0307	 490
+DISPLAY				  CODE	    02A5	 420
+DIV_BYTES			  CODE	    020E	 305
+DIV_FUNC			  CODE	    0189	 199
+DO_LOOP1			  CODE	    02EC	 472
+DPH				  DATA	      83
+DPL				  DATA	      82
+EA				  BIT	      AF
+EN				  NUMBER    00A2	  10
+EQU_FUNC			  CODE	    0159	 171
+ERRORS				  CODE	    0231	 334
+ES				  BIT	      AC
+ET0				  BIT	      A9
+ET1				  BIT	      AB
+EX0				  BIT	      A8
+EX1				  BIT	      AA
+EXIT1				  CODE	    02F8	 481
+EXTI0				  CODE	    0003
+EXTI1				  CODE	    0013
+F0				  BIT	      D5
+FIM				  CODE	    0245	 348
+IE				  DATA	      A8
+IE0				  BIT	      89
+IE1				  BIT	      8B
+INITIALYZE			  CODE	    02BB	 439
+INT0				  BIT	      B2
+INT1				  BIT	      B3
+IP				  DATA	      B8
+IT0				  BIT	      88
+IT1				  BIT	      8A
+JUMP_BURST			  CODE	    01DD	 267
+JUMP_DIVIDE			  CODE	    00C2	  83
+JUMP_EQUAL			  CODE	    00C5	  84
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 12
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+JUMP_MINUS			  CODE	    00BC	  81
+JUMP_MULTI			  CODE	    00BF	  82
+JUMP_PLUS			  CODE	    00B9	  80
+JUMP_RFRESH			  CODE	    00C8	  89
+JUMP_TO_0			  CODE	    009B	  69
+JUMP_TO_1			  CODE	    009E	  70
+JUMP_TO_2			  CODE	    00A1	  71
+JUMP_TO_3			  CODE	    00A4	  72
+JUMP_TO_4			  CODE	    00A7	  73
+JUMP_TO_5			  CODE	    00AA	  74
+JUMP_TO_6			  CODE	    00AD	  75
+JUMP_TO_7			  CODE	    00B0	  76
+JUMP_TO_8			  CODE	    00B3	  77
+JUMP_TO_9			  CODE	    00B6	  78
+L1				  CODE	    0044	  25
+LCD_INIT			  CODE	    02CD	 454
+MENOR10				  CODE	    0289	 396
+MENOR100			  CODE	    026E	 377
+MSG_ERR_0			  CODE	    0325	 500
+MSG_ERR_1			  CODE	    0335	 501
+MSG_START			  CODE	    0314	 499
+MUL_BYTES			  CODE	    01FC	 294
+MUL_FUNC			  CODE	    017D	 192
+NEW_DIGIT			  CODE	    01A9	 227
+NORMAL				  CODE	    0246	 351
+NOVODIG				  NUMBER    00A6	  12
+NOVODIGITO2			  CODE	    01C8	 252
+NOVONUM				  NUMBER    00A7	  11
+NUM_0				  CODE	    00E1	 108
+NUM_1				  CODE	    00ED	 114
+NUM_2				  CODE	    00F9	 120
+NUM_3				  CODE	    0105	 126
+NUM_4				  CODE	    0111	 132
+NUM_5				  CODE	    011D	 138
+NUM_6				  CODE	    0129	 144
+NUM_7				  CODE	    0135	 150
+NUM_8				  CODE	    0141	 156
+NUM_9				  CODE	    014D	 162
+OPERATOR			  CODE	    0195	 206
+OV				  BIT	      D2
+P				  BIT	      D0
+P0				  DATA	      80
+P1				  DATA	      90
+P2				  DATA	      A0
+P3				  DATA	      B0
+PCON				  DATA	      87
+PROX				  CODE	    0228	 325
+PROX2				  CODE	    023B	 340
+PS				  BIT	      BC
+PSW				  DATA	      D0
+PT0				  BIT	      B9
+PT1				  BIT	      BB
+PX0				  BIT	      B8
+PX1				  BIT	      BA
+RB8				  BIT	      9A
+RD				  BIT	      B7
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 13
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+REN				  BIT	      9C
+RESET				  CODE	    0000
+RESULT				  CODE	    01E0	 273
+RI				  BIT	      98
+RS				  NUMBER    00A1	   9
+RS0				  BIT	      D3
+RS1				  BIT	      D4
+RXD				  BIT	      B0
+SBUF				  DATA	      99
+SCON				  DATA	      98
+SECOND_NUMBER			  CODE	    01BE	 242
+SINT				  CODE	    0023
+SM0				  BIT	      9F
+SM1				  BIT	      9E
+SM2				  BIT	      9D
+SP				  DATA	      81
+START				  CODE	    0040	  18
+STARTUP_MSG			  CODE	    02E5	 468
+SUB_BYTES			  CODE	    01EE	 284
+SUB_FUNC			  CODE	    0171	 185
+T0				  BIT	      B4
+T1				  BIT	      B5
+TB8				  BIT	      9B
+TCON				  DATA	      88
+TF0				  BIT	      8D
+TF1				  BIT	      8F
+TH0				  DATA	      8C
+TH1				  DATA	      8D
+TI				  BIT	      99
+TIMER0				  CODE	    000B
+TIMER1				  CODE	    001B
+TL0				  DATA	      8A
+TL1				  DATA	      8B
+TMOD				  DATA	      89
+TO_PRINT			  CODE	    0218	 316
+TR0				  BIT	      8C
+TR1				  BIT	      8E
+TXD				  BIT	      B1
+WR				  BIT	      B6
