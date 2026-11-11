@@ -10,24 +10,24 @@
 ; MODULAR HARDWARE CONFIGURATION (UBAH PIN DI SINI)
 ; =================================================================
 ; --- Konfigurasi LCD ---
-LCD_DAT     EQU P0      ; Port Data LCD (D0-D7)
-LCD_RS      EQU P2.1    ; Pin RS pada LCD
-LCD_EN      EQU P2.2    ; Pin EN pada LCD
+LCD_DAT     EQU P1      ; Port Data LCD (D0-D7)
+LCD_RS      EQU P3.2    ; Pin RS pada LCD
+LCD_EN      EQU P3.3    ; Pin EN pada LCD
 
 ; --- Konfigurasi Port Keypad Matriks ---
-KEY_PORT    EQU P3      ; Base Port untuk Keypad
-COL1        EQU P3.0    ; Keypad Kolom 1
-COL2        EQU P3.1    ; Keypad Kolom 2
-COL3        EQU P3.2    ; Keypad Kolom 3
-COL4        EQU P3.3    ; Keypad Kolom 4
-ROW1        EQU P3.4    ; Keypad Baris 1
-ROW2        EQU P3.5    ; Keypad Baris 2
-ROW3        EQU P3.6    ; Keypad Baris 3
-ROW4        EQU P3.7    ; Keypad Baris 4
+KEY_PORT    EQU P2      ; Base Port untuk Keypad
+COL1        EQU P2.0    ; Keypad Kolom 1
+COL2        EQU P2.1    ; Keypad Kolom 2
+COL3        EQU P2.2    ; Keypad Kolom 3
+COL4        EQU P2.3    ; Keypad Kolom 4
+ROW1        EQU P2.4    ; Keypad Baris 1
+ROW2        EQU P2.5    ; Keypad Baris 2
+ROW3        EQU P2.6    ; Keypad Baris 3
+ROW4        EQU P2.7    ; Keypad Baris 4
 
 ; --- Flag Internal State (Meminjam pin P2 yang tidak terpakai) ---
-NOVONUM     EQU P2.7    ; Flag: HIGH saat menulis angka kedua
-NOVODIG     EQU P2.6    ; Flag: HIGH saat digit pertama sudah ditulis
+NOVONUM     EQU P3.7    ; Flag: HIGH saat menulis angka kedua
+NOVODIG     EQU P3.6    ; Flag: HIGH saat digit pertama sudah ditulis
 ; =================================================================
 
     ORG 00H
