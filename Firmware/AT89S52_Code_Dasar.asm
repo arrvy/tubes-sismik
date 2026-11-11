@@ -1,13 +1,11 @@
 ; =================================================================
-; BASIC CALCULATOR 8051 (REFINED & PIN-MODULAR VERSION)
-; Fitur: 
-; - Operator langsung tampil setelah angka pertama (Augend)
-; - Tombol R4 C1 berfungsi penuh sebagai ON/C (Clear/Reset All)
-; - PIN MODULAR: Definisi port/pin I/O terpusat di atas.
+; BASIC CALCULATOR 8051 (MODULAR + "ANS" CHAINING FEATURE)
+; Konfigurasi PINOUT TERBARU:
+; LCD Data = P1, LCD Ctrl = P3, Keypad = P2
 ; =================================================================
 
 ; =================================================================
-; MODULAR HARDWARE CONFIGURATION (UBAH PIN DI SINI)
+; MODULAR HARDWARE CONFIGURATION
 ; =================================================================
 ; --- Konfigurasi LCD ---
 LCD_DAT     EQU P1      ; Port Data LCD (D0-D7)
@@ -25,9 +23,10 @@ ROW2        EQU P2.5    ; Keypad Baris 2
 ROW3        EQU P2.6    ; Keypad Baris 3
 ROW4        EQU P2.7    ; Keypad Baris 4
 
-; --- Flag Internal State (Meminjam pin P2 yang tidak terpakai) ---
+; --- Flag Internal State ---
 NOVONUM     EQU P3.7    ; Flag: HIGH saat menulis angka kedua
 NOVODIG     EQU P3.6    ; Flag: HIGH saat digit pertama sudah ditulis
+ANS_FLAG    EQU P3.5    ; Flag: HIGH jika hasil hitungan sedang tampil di layar
 ; =================================================================
 
     ORG 00H
@@ -36,7 +35,7 @@ NOVODIG     EQU P3.6    ; Flag: HIGH saat digit pertama sudah ditulis
     ORG 40H 
 START:  
     ACALL INITIALYZE
-    SJMP L1             ; Langsung mulai scanning keypad
+    SJMP L1
 
 ; =================================================================
 ; KEYPAD SCANNING (4x4 Matrix)
@@ -48,17 +47,15 @@ L1:
     JNB COL4, C4
     SJMP L1
 
-C1: ; SCANNING KOLOM 1
-    JNB ROW1, JUMP_TO_7 
+C1: JNB ROW1, JUMP_TO_7 
     JNB ROW2, JUMP_TO_4 
     JNB ROW3, JUMP_TO_1 
-    JNB ROW4, JUMP_RFRESH   ; <-- Tombol R4 C1 (ON/C)
+    JNB ROW4, JUMP_RFRESH   ; <-- Tombol ON/C
     SETB COL1
     CLR COL2
     SJMP L1
 
-C2: ; SCANNING KOLOM 2
-    JNB ROW1, JUMP_TO_8 
+C2: JNB ROW1, JUMP_TO_8 
     JNB ROW2, JUMP_TO_5 
     JNB ROW3, JUMP_TO_2 
     JNB ROW4, JUMP_TO_0 
@@ -66,8 +63,7 @@ C2: ; SCANNING KOLOM 2
     CLR COL3
     SJMP L1
 
-C3: ; SCANNING KOLOM 3
-    JNB ROW1, JUMP_TO_9 
+C3: JNB ROW1, JUMP_TO_9 
     JNB ROW2, JUMP_TO_6 
     JNB ROW3, JUMP_TO_3 
     JNB ROW4, JUMP_EQUAL    
@@ -75,8 +71,7 @@ C3: ; SCANNING KOLOM 3
     CLR COL4
     SJMP L1
 
-C4: ; SCANNING KOLOM 4
-    JNB ROW1, JUMP_DIVIDE   
+C4: JNB ROW1, JUMP_DIVIDE   
     JNB ROW2, JUMP_MULTI    
     JNB ROW3, JUMP_MINUS    
     JNB ROW4, JUMP_PLUS     
@@ -84,7 +79,7 @@ C4: ; SCANNING KOLOM 4
     CLR COL1
     LJMP L1
 
-; --- PENGALIHAN JUMP (OUT OF RANGE RELATIVE JUMP FIX) ---
+; --- PENGALIHAN JUMP ---
 JUMP_TO_0:  LJMP NUM_0
 JUMP_TO_1:  LJMP NUM_1
 JUMP_TO_2:  LJMP NUM_2
@@ -95,7 +90,6 @@ JUMP_TO_6:  LJMP NUM_6
 JUMP_TO_7:  LJMP NUM_7
 JUMP_TO_8:  LJMP NUM_8
 JUMP_TO_9:  LJMP NUM_9
-
 JUMP_PLUS:  LJMP ADD_FUNC
 JUMP_MINUS: LJMP SUB_FUNC
 JUMP_MULTI: LJMP MUL_FUNC
@@ -106,91 +100,116 @@ JUMP_EQUAL: LJMP EQU_FUNC
 ; FUNGSI RESET / CLEAR (ON/C)
 ; =================================================================
 JUMP_RFRESH: 
-    MOV R0, #01H        ; Command Clear LCD
+    MOV R0, #01H        
     ACALL COMMAND
-    
-    ; Reset seluruh nilai register dan state
-    MOV R1, #00H        ; Reset Angka 1
-    MOV R2, #00H        ; Reset Operator
-    MOV R3, #00H        ; Reset Angka 2
-    MOV R4, #00H        ; Reset Hasil / Temp
-    MOV R5, #00H        ; Reset Sisa Bagi
+    MOV R1, #00H        
+    MOV R2, #00H        
+    MOV R3, #00H        
+    MOV R4, #00H        
+    MOV R5, #00H        
     MOV R6, #00H
     MOV R7, #00H
-    CLR NOVONUM         ; Kembalikan flag
-    CLR NOVODIG         ; Kembalikan flag
+    CLR NOVONUM         
+    CLR NOVODIG 
+    CLR ANS_FLAG        ; Reset status ANS
     LJMP L1
 
 ; =================================================================
 ; INPUT ANGKA (0-9)
 ; =================================================================
 NUM_0: JNB ROW4, NUM_0
+       ACALL CHECK_NEW_CALC
        MOV R0, #'0'
        ACALL ASCII_2_DEC
        ACALL DISPLAY
        LJMP L1
 
 NUM_1: JNB ROW3, NUM_1          
+       ACALL CHECK_NEW_CALC
        MOV R0, #'1'
        ACALL ASCII_2_DEC
        ACALL DISPLAY
        LJMP L1
 
 NUM_2: JNB ROW3, NUM_2
+       ACALL CHECK_NEW_CALC
        MOV R0, #'2'
        ACALL ASCII_2_DEC
        ACALL DISPLAY
        LJMP L1
 
 NUM_3: JNB ROW3, NUM_3
+       ACALL CHECK_NEW_CALC
        MOV R0, #'3'
        ACALL ASCII_2_DEC
        ACALL DISPLAY
        LJMP L1
 
 NUM_4: JNB ROW2, NUM_4
+       ACALL CHECK_NEW_CALC
        MOV R0, #'4'
        ACALL ASCII_2_DEC
        ACALL DISPLAY
        LJMP L1
 
 NUM_5: JNB ROW2, NUM_5
+       ACALL CHECK_NEW_CALC
        MOV R0, #'5'
        ACALL ASCII_2_DEC
        ACALL DISPLAY
        LJMP L1
 
 NUM_6: JNB ROW2, NUM_6
+       ACALL CHECK_NEW_CALC
        MOV R0, #'6'
        ACALL ASCII_2_DEC
        ACALL DISPLAY
        LJMP L1
 
 NUM_7: JNB ROW1, NUM_7
+       ACALL CHECK_NEW_CALC
        MOV R0, #'7'
        ACALL ASCII_2_DEC
        ACALL DISPLAY
        LJMP L1
 
 NUM_8: JNB ROW1, NUM_8   
+       ACALL CHECK_NEW_CALC
        MOV R0, #'8'
        ACALL ASCII_2_DEC
        ACALL DISPLAY
        LJMP L1
 
 NUM_9: JNB ROW1, NUM_9
+       ACALL CHECK_NEW_CALC
        MOV R0, #'9'
        ACALL ASCII_2_DEC       
        ACALL DISPLAY
        LJMP L1
 
 ; =================================================================
+; CEK JIKA MEMULAI PERHITUNGAN BARU SETELAH HASIL KELUAR
+; =================================================================
+CHECK_NEW_CALC:
+    JNB ANS_FLAG, CHECK_END
+    MOV R0, #01H
+    ACALL COMMAND
+    MOV R1, #00H
+    MOV R2, #00H
+    MOV R3, #00H
+    MOV R4, #00H
+    MOV R5, #00H
+    CLR NOVONUM
+    CLR NOVODIG
+    CLR ANS_FLAG
+CHECK_END:
+    RET
+
+; =================================================================
 ; INPUT OPERATOR & SAMA DENGAN
 ; =================================================================
 EQU_FUNC:
     JNB ROW4, EQU_FUNC
-    MOV R0, #'='            
-    ACALL DISPLAY
     ACALL RESULT        
     LJMP L1
 
@@ -223,10 +242,32 @@ DIV_FUNC:
     LJMP L1
 
 OPERATOR:
-    SETB NOVONUM        
-    CLR NOVODIG         
     MOV A, R0           
     MOV R2, A           
+    
+    JNB ANS_FLAG, NORMAL_OP     
+    
+    ; --- LOGIKA CHAINING (MENCETAK "ANS") ---
+    MOV A, R4           
+    MOV R1, A           
+    MOV R3, #00H        
+    CLR ANS_FLAG        
+    
+    MOV R0, #01H
+    ACALL COMMAND
+    MOV R0, #'A'
+    ACALL DISPLAY
+    MOV R0, #'N'
+    ACALL DISPLAY
+    MOV R0, #'S'
+    ACALL DISPLAY
+    
+    MOV A, R2           
+    MOV R0, A
+
+NORMAL_OP:
+    SETB NOVONUM        
+    CLR NOVODIG         
     RET
 
 ; =================================================================
@@ -363,6 +404,11 @@ FIM:
     RET
 
 NORMAL: 
+    SETB ANS_FLAG       
+    MOV R0, #0C9H       
+    ACALL COMMAND
+    
+    MOV A, R4           
     MOV R7, #100D
     CLR C
     SUBB A, R7
@@ -432,17 +478,17 @@ DECIMAL:
 ; DRIVER LCD
 ; =================================================================
 DISPLAY:
-    MOV LCD_DAT, R0     ; Menggunakan Port LCD Modular
-    SETB LCD_RS         ; Menggunakan Pin RS Modular
-    SETB LCD_EN         ; Menggunakan Pin EN Modular
+    MOV LCD_DAT, R0     
+    SETB LCD_RS         
+    SETB LCD_EN         
     ACALL DELAY
     CLR LCD_EN
     RET
 
 COMMAND:
-    MOV LCD_DAT, R0     ; Menggunakan Port LCD Modular
-    CLR LCD_RS          ; Menggunakan Pin RS Modular
-    SETB LCD_EN         ; Menggunakan Pin EN Modular
+    MOV LCD_DAT, R0     
+    CLR LCD_RS          
+    SETB LCD_EN         
     ACALL DELAY
     CLR LCD_EN
     RET
@@ -461,9 +507,9 @@ INITIALYZE:
     MOV R6, A
     MOV R7, A
     
-    ; Setup Port Modular
-    MOV LCD_DAT, A      ; Reset Port Data LCD
-    MOV KEY_PORT, #0FEH ; Setup awal Keypad Matrix (Kolom 1 Low)
+    MOV LCD_DAT, A      
+    MOV KEY_PORT, #0FEH 
+    CLR ANS_FLAG
     
 LCD_INIT:
     MOV R0,#38H
