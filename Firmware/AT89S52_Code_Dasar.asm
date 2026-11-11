@@ -29,7 +29,7 @@ NOVODIG     EQU P3.6    ; Flag: HIGH saat digit pertama sudah ditulis
 ANS_FLAG    EQU P3.5    ; Flag: HIGH jika hasil hitungan sedang tampil di layar
 ; =================================================================
 
-    ORG 00H
+ORG 00H
     AJMP START
 
     ORG 40H 
@@ -253,7 +253,7 @@ OPERATOR:
     MOV R3, #00H        
     CLR ANS_FLAG        
     
-    MOV R0, #01H
+    MOV R0, #80H
     ACALL COMMAND
     MOV R0, #'A'
     ACALL DISPLAY
@@ -271,28 +271,28 @@ NORMAL_OP:
     RET
 
 ; =================================================================
-; KONVERSI ASCII KE DECIMAL
+; KONVERSI ASCII KE DECIMAL (Fix: Menggunakan ANL bukan SUBB)
 ; =================================================================
 ASCII_2_DEC:
     JB NOVONUM, SECOND_NUMBER   
     JB NOVODIG, NEW_DIGIT       
     MOV A, R0
-    SUBB A, #30H
+    ANL A, #0FH         ; Lebih stabil dari SUBB A, #30H
     MOV R1, A           
     SETB NOVODIG        
     RET
 
 NEW_DIGIT: 
     MOV A, R0
-    MOV B, #10D
-    SUBB A, #30H
+    ANL A, #0FH
     MOV R7, A
     MOV A, R1
+    MOV B, #10D
     MUL AB              
     MOV R6, B 
-    CJNE R6, #00H, JUMP_BURST
+    CJNE R6, #00H, JUMP_BURST_WRAPPER
     ADD A, R7
-    JC JUMP_BURST
+    JC JUMP_BURST_WRAPPER
     MOV R1, A           
     SETB NOVODIG
     RET
@@ -300,27 +300,27 @@ NEW_DIGIT:
 SECOND_NUMBER:
     JB NOVODIG, NOVODIGITO2
     MOV A, R0
-    SUBB A, #30H
+    ANL A, #0FH
     MOV R3, A           
     SETB NOVODIG
     RET
 
 NOVODIGITO2:
     MOV A, R0
-    MOV B, #10D
-    SUBB A, #30H
+    ANL A, #0FH
     MOV R7, A
     MOV A, R3
+    MOV B, #10D
     MUL AB              
     MOV R6, B
-    CJNE R6, #00H, JUMP_BURST
+    CJNE R6, #00H, JUMP_BURST_WRAPPER
     ADD A, R7
-    JC JUMP_BURST
+    JC JUMP_BURST_WRAPPER
     MOV R3, A           
     SETB NOVODIG
     RET
 
-JUMP_BURST: 
+JUMP_BURST_WRAPPER:
     LJMP ERRORS
 
 ; =================================================================
@@ -332,7 +332,7 @@ ADD_BYTES:
     MOV A, R1
     CLR C
     ADD A, R3
-    JC JUMP_BURST
+    JC JUMP_BURST_WRAPPER
     MOV R5, #0H
     MOV R4, A
     LJMP TO_PRINT
@@ -342,7 +342,7 @@ SUB_BYTES:
     MOV A, R1
     CLR C
     SUBB A, R3
-    JC JUMP_BURST
+    JC JUMP_BURST_WRAPPER
     MOV R5, #0H
     MOV R4, A
     LJMP TO_PRINT
@@ -353,7 +353,7 @@ MUL_BYTES:
     MOV B, R3
     MUL AB
     MOV R7, B
-    CJNE R7, #0H, ERRORS
+    CJNE R7, #0H, JUMP_BURST_WRAPPER
     MOV R5, #0H
     MOV R4, A
     LJMP TO_PRINT
@@ -372,40 +372,41 @@ DIV_BYTES:
 TO_PRINT:
     CJNE R3, #0D, NORMAL
     CJNE R2, #'/', NORMAL
+    ; Pengecekan Error Dibagi 0
     MOV R0, #0C0H
     ACALL COMMAND
     MOV DPTR, #MSG_ERR_0
-    CLR C
     MOV R7, #0D
 PROX:   
     MOV A, R7
     MOVC A, @A+DPTR
+    JZ FIM_ERR          ; Fix BUG: Pengecekan dilakukan sebelum display!
     MOV R0, A
     ACALL DISPLAY
     INC R7
-    JNZ PROX
-    RET
+    SJMP PROX
 
 ERRORS:
     MOV R0, #0C0H
     ACALL COMMAND
     MOV DPTR, #MSG_ERR_1
-    CLR C
     MOV R7, #0D
 PROX2:  
     MOV A, R7
     MOVC A, @A+DPTR
+    JZ FIM_ERR          ; Fix BUG: Pengecekan dilakukan sebelum display!
     MOV R0, A
     ACALL DISPLAY
-    JZ FIM
     INC R7
     SJMP PROX2
-FIM:
+    
+FIM_ERR:
+    SETB ANS_FLAG       ; Set agar kalau user tekan angka baru, layar me-refresh
     RET
 
 NORMAL: 
     SETB ANS_FLAG       
-    MOV R0, #0C9H       
+    MOV R0, #0CBH       ; Posisi C0 + 11 = Menaruh tepat 3 digit & desimal di pojok kanan 
     ACALL COMMAND
     
     MOV A, R4           
@@ -509,6 +510,8 @@ INITIALYZE:
     
     MOV LCD_DAT, A      
     MOV KEY_PORT, #0FEH 
+    CLR NOVONUM
+    CLR NOVODIG
     CLR ANS_FLAG
     
 LCD_INIT:
@@ -532,8 +535,8 @@ STARTUP_MSG:
 DO_LOOP1:   
     CLR A
     MOVC A, @A+DPTR
-    MOV R0, A
     JZ EXIT1
+    MOV R0, A
     ACALL DISPLAY           
     ACALL DELAY             
     INC DPTR
