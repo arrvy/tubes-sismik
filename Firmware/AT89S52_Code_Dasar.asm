@@ -474,12 +474,35 @@ DECIMAL:
     MOV R0, A
     ACALL DISPLAY       
     RET
+; =================================================================
+; RUTIN PEMBALIK BIT (BIT REVERSAL) 
+; Memutar urutan bit (D0 jadi D7, D1 jadi D6, dst)
+; =================================================================
+REVERSE_BITS:
+    MOV 3EH, R7         ; Backup R7 ke RAM agar tidak merusak loop teks (OVERFLOW)
+    MOV 3FH, R6         ; Backup R6 ke RAM
+    
+    MOV R7, #8          ; Lakukan pergeseran sebanyak 8 kali (8-bit)
+    MOV R6, #0          ; R6 sebagai penampung data yang sudah dibalik
+REV_LOOP:
+    RRC A               ; Geser bit paling kanan (LSB) dari A ke Carry Flag
+    XCH A, R6           ; Tukar nilai A dengan R6 sementara
+    RLC A               ; Masukkan Carry Flag tadi ke bit kanan (R6) sambil digeser ke kiri
+    XCH A, R6           ; Tukar kembali
+    DJNZ R7, REV_LOOP   ; Ulangi sampai 8 bit selesai dipindah
+    
+    MOV A, R6           ; Pindahkan hasil akhir (yang sudah terbalik) ke Akumulator
+    MOV R7, 3EH         ; Kembalikan nilai asli R7
+    MOV R6, 3FH         ; Kembalikan nilai asli R6
+    RET
 
 ; =================================================================
-; DRIVER LCD
+; DRIVER LCD (Updated dengan Pembalik Bit)
 ; =================================================================
 DISPLAY:
-    MOV LCD_DAT, R0     
+    MOV A, R0           ; 1. Ambil data asli dari R0
+    ACALL REVERSE_BITS  ; 2. Panggil rutin pembalik bit
+    MOV LCD_DAT, A      ; 3. Kirim data yang SUDAH DIBALIK ke Port 1
     SETB LCD_RS         
     SETB LCD_EN         
     ACALL DELAY
@@ -487,13 +510,14 @@ DISPLAY:
     RET
 
 COMMAND:
-    MOV LCD_DAT, R0     
+    MOV A, R0           ; 1. Ambil instruksi (command) asli dari R0
+    ACALL REVERSE_BITS  ; 2. Panggil rutin pembalik bit
+    MOV LCD_DAT, A      ; 3. Kirim instruksi yang SUDAH DIBALIK ke Port 1
     CLR LCD_RS          
     SETB LCD_EN         
     ACALL DELAY
     CLR LCD_EN
     RET
-
 ; =================================================================
 ; INITIALIZATION & DELAY
 ; =================================================================

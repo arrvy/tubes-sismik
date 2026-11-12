@@ -54,7 +54,7 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
    34:
    35:		N      0040	    ORG 40H
    36:	  0040			START:
-   37:	  0040	71 08		    ACALL INITIALYZE
+   37:	  0040	71 22		    ACALL INITIALYZE
    38:	  0042	80 00		    SJMP L1
    39:
    40:				; =================================================================
@@ -135,7 +135,7 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   101:				; =================================================================
   102:	  00C8			JUMP_RFRESH:
   103:	  00C8	78 01		    MOV R0, #01H
-  104:	  00CA	51 FD		    ACALL COMMAND
+  104:	  00CA	71 14		    ACALL COMMAND
   105:	  00CC	79 00		    MOV R1, #00H
   106:	  00CE	7A 00		    MOV R2, #00H
   107:	  00D0	7B 00		    MOV R3, #00H
@@ -155,35 +155,35 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   121:	  00E6	31 6F		       ACALL CHECK_NEW_CALC
   122:	  00E8	78 30		       MOV R0, #'0'
   123:	  00EA	31 E1		       ACALL ASCII_2_DEC
-  124:	  00EC	51 F2		       ACALL DISPLAY
+  124:	  00EC	71 06		       ACALL DISPLAY
   125:	  00EE	02 00 44	       LJMP L1
   126:
   127:	  00F1	30 A6 FD	NUM_1: JNB ROW3, NUM_1
   128:	  00F4	31 6F		       ACALL CHECK_NEW_CALC
   129:	  00F6	78 31		       MOV R0, #'1'
   130:	  00F8	31 E1		       ACALL ASCII_2_DEC
-  131:	  00FA	51 F2		       ACALL DISPLAY
+  131:	  00FA	71 06		       ACALL DISPLAY
   132:	  00FC	02 00 44	       LJMP L1
   133:
   134:	  00FF	30 A6 FD	NUM_2: JNB ROW3, NUM_2
   135:	  0102	31 6F		       ACALL CHECK_NEW_CALC
   136:	  0104	78 32		       MOV R0, #'2'
   137:	  0106	31 E1		       ACALL ASCII_2_DEC
-  138:	  0108	51 F2		       ACALL DISPLAY
+  138:	  0108	71 06		       ACALL DISPLAY
   139:	  010A	02 00 44	       LJMP L1
   140:
   141:	  010D	30 A6 FD	NUM_3: JNB ROW3, NUM_3
   142:	  0110	31 6F		       ACALL CHECK_NEW_CALC
   143:	  0112	78 33		       MOV R0, #'3'
   144:	  0114	31 E1		       ACALL ASCII_2_DEC
-  145:	  0116	51 F2		       ACALL DISPLAY
+  145:	  0116	71 06		       ACALL DISPLAY
   146:	  0118	02 00 44	       LJMP L1
   147:
   148:	  011B	30 A5 FD	NUM_4: JNB ROW2, NUM_4
   149:	  011E	31 6F		       ACALL CHECK_NEW_CALC
   150:	  0120	78 34		       MOV R0, #'4'
   151:	  0122	31 E1		       ACALL ASCII_2_DEC
-  152:	  0124	51 F2		       ACALL DISPLAY
+  152:	  0124	71 06		       ACALL DISPLAY
   153:	  0126	02 00 44	       LJMP L1
   154:
   155:	  0129	30 A5 FD	NUM_5: JNB ROW2, NUM_5
@@ -197,35 +197,35 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   156:	  012C	31 6F		       ACALL CHECK_NEW_CALC
   157:	  012E	78 35		       MOV R0, #'5'
   158:	  0130	31 E1		       ACALL ASCII_2_DEC
-  159:	  0132	51 F2		       ACALL DISPLAY
+  159:	  0132	71 06		       ACALL DISPLAY
   160:	  0134	02 00 44	       LJMP L1
   161:
   162:	  0137	30 A5 FD	NUM_6: JNB ROW2, NUM_6
   163:	  013A	31 6F		       ACALL CHECK_NEW_CALC
   164:	  013C	78 36		       MOV R0, #'6'
   165:	  013E	31 E1		       ACALL ASCII_2_DEC
-  166:	  0140	51 F2		       ACALL DISPLAY
+  166:	  0140	71 06		       ACALL DISPLAY
   167:	  0142	02 00 44	       LJMP L1
   168:
   169:	  0145	30 A4 FD	NUM_7: JNB ROW1, NUM_7
   170:	  0148	31 6F		       ACALL CHECK_NEW_CALC
   171:	  014A	78 37		       MOV R0, #'7'
   172:	  014C	31 E1		       ACALL ASCII_2_DEC
-  173:	  014E	51 F2		       ACALL DISPLAY
+  173:	  014E	71 06		       ACALL DISPLAY
   174:	  0150	02 00 44	       LJMP L1
   175:
   176:	  0153	30 A4 FD	NUM_8: JNB ROW1, NUM_8
   177:	  0156	31 6F		       ACALL CHECK_NEW_CALC
   178:	  0158	78 38		       MOV R0, #'8'
   179:	  015A	31 E1		       ACALL ASCII_2_DEC
-  180:	  015C	51 F2		       ACALL DISPLAY
+  180:	  015C	71 06		       ACALL DISPLAY
   181:	  015E	02 00 44	       LJMP L1
   182:
   183:	  0161	30 A4 FD	NUM_9: JNB ROW1, NUM_9
   184:	  0164	31 6F		       ACALL CHECK_NEW_CALC
   185:	  0166	78 39		       MOV R0, #'9'
   186:	  0168	31 E1		       ACALL ASCII_2_DEC
-  187:	  016A	51 F2		       ACALL DISPLAY
+  187:	  016A	71 06		       ACALL DISPLAY
   188:	  016C	02 00 44	       LJMP L1
   189:
   190:				; =================================================================
@@ -234,7 +234,7 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   193:	  016F			CHECK_NEW_CALC:
   194:	  016F	30 B5 14	    JNB ANS_FLAG, CHECK_END
   195:	  0172	78 01		    MOV R0, #01H
-  196:	  0174	51 FD		    ACALL COMMAND
+  196:	  0174	71 14		    ACALL COMMAND
   197:	  0176	79 00		    MOV R1, #00H
   198:	  0178	7A 00		    MOV R2, #00H
   199:	  017A	7B 00		    MOV R3, #00H
@@ -265,28 +265,28 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   217:	  018F	30 A7 FD	    JNB ROW4, ADD_FUNC
   218:	  0192	78 2B		    MOV R0, #'+'
   219:	  0194	31 BF		    ACALL OPERATOR
-  220:	  0196	51 F2		    ACALL DISPLAY
+  220:	  0196	71 06		    ACALL DISPLAY
   221:	  0198	02 00 44	    LJMP L1
   222:
   223:	  019B			SUB_FUNC:
   224:	  019B	30 A6 FD	    JNB ROW3, SUB_FUNC
   225:	  019E	78 2D		    MOV R0, #'-'
   226:	  01A0	31 BF		    ACALL OPERATOR
-  227:	  01A2	51 F2		    ACALL DISPLAY
+  227:	  01A2	71 06		    ACALL DISPLAY
   228:	  01A4	02 00 44	    LJMP L1
   229:
   230:	  01A7			MUL_FUNC:
   231:	  01A7	30 A5 FD	    JNB ROW2, MUL_FUNC
   232:	  01AA	78 2A		    MOV R0, #'*'
   233:	  01AC	31 BF		    ACALL OPERATOR
-  234:	  01AE	51 F2		    ACALL DISPLAY
+  234:	  01AE	71 06		    ACALL DISPLAY
   235:	  01B0	02 00 44	    LJMP L1
   236:
   237:	  01B3			DIV_FUNC:
   238:	  01B3	30 A4 FD	    JNB ROW1, DIV_FUNC
   239:	  01B6	78 2F		    MOV R0, #'/'
   240:	  01B8	31 BF		    ACALL OPERATOR
-  241:	  01BA	51 F2		    ACALL DISPLAY
+  241:	  01BA	71 06		    ACALL DISPLAY
   242:	  01BC	02 00 44	    LJMP L1
   243:
   244:	  01BF			OPERATOR:
@@ -302,13 +302,13 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   254:	  01C8	C2 B5		    CLR ANS_FLAG
   255:
   256:	  01CA	78 80		    MOV R0, #80H
-  257:	  01CC	51 FD		    ACALL COMMAND
+  257:	  01CC	71 14		    ACALL COMMAND
   258:	  01CE	78 41		    MOV R0, #'A'
-  259:	  01D0	51 F2		    ACALL DISPLAY
+  259:	  01D0	71 06		    ACALL DISPLAY
   260:	  01D2	78 4E		    MOV R0, #'N'
-  261:	  01D4	51 F2		    ACALL DISPLAY
+  261:	  01D4	71 06		    ACALL DISPLAY
   262:	  01D6	78 53		    MOV R0, #'S'
-  263:	  01D8	51 F2		    ACALL DISPLAY
+  263:	  01D8	71 06		    ACALL DISPLAY
   264:
   265:	  01DA	EA		    MOV A, R2
   266:	  01DB	F8		    MOV R0, A
@@ -436,8 +436,8 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   374:	  0260	BA 2F 29	    CJNE R2, #'/', NORMAL
   375:				    ; Pengecekan Error Dibagi 0
   376:	  0263	78 C0		    MOV R0, #0C0H
-  377:	  0265	51 FD		    ACALL COMMAND
-  378:	  0267	90 03 74	    MOV DPTR, #MSG_ERR_0
+  377:	  0265	71 14		    ACALL COMMAND
+  378:	  0267	90 03 8E	    MOV DPTR, #MSG_ERR_0
   379:	  026A	7F 00		    MOV R7, #0D
 
 ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 8
@@ -451,21 +451,21 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   382:	  026D	93		    MOVC A, @A+DPTR
   383:	  026E	60 19		    JZ FIM_ERR          ; Fix BUG: Pengecekan dilakukan sebelum display!
   384:	  0270	F8		    MOV R0, A
-  385:	  0271	51 F2		    ACALL DISPLAY
+  385:	  0271	71 06		    ACALL DISPLAY
   386:	  0273	0F		    INC R7
   387:	  0274	80 F6		    SJMP PROX
   388:
   389:	  0276			ERRORS:
   390:	  0276	78 C0		    MOV R0, #0C0H
-  391:	  0278	51 FD		    ACALL COMMAND
-  392:	  027A	90 03 84	    MOV DPTR, #MSG_ERR_1
+  391:	  0278	71 14		    ACALL COMMAND
+  392:	  027A	90 03 9E	    MOV DPTR, #MSG_ERR_1
   393:	  027D	7F 00		    MOV R7, #0D
   394:	  027F			PROX2:
   395:	  027F	EF		    MOV A, R7
   396:	  0280	93		    MOVC A, @A+DPTR
   397:	  0281	60 06		    JZ FIM_ERR          ; Fix BUG: Pengecekan dilakukan sebelum display!
   398:	  0283	F8		    MOV R0, A
-  399:	  0284	51 F2		    ACALL DISPLAY
+  399:	  0284	71 06		    ACALL DISPLAY
   400:	  0286	0F		    INC R7
   401:	  0287	80 F6		    SJMP PROX2
   402:
@@ -476,7 +476,7 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   407:	  028C			NORMAL:
   408:	  028C	D2 B5		    SETB ANS_FLAG
   409:	  028E	78 CB		    MOV R0, #0CBH       ; Posisi C0 + 11 = Menaruh tepat 3 digit & desimal di pojok kanan
-  410:	  0290	51 FD		    ACALL COMMAND
+  410:	  0290	71 14		    ACALL COMMAND
   411:
   412:	  0292	EC		    MOV A, R4
   413:	  0293	7F 64		    MOV R7, #100D
@@ -488,7 +488,7 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   419:	  029C	84		    DIV AB
   420:	  029D	24 30		    ADD A, #30H
   421:	  029F	F8		    MOV R0, A
-  422:	  02A0	51 F2		    ACALL DISPLAY
+  422:	  02A0	71 06		    ACALL DISPLAY
   423:	  02A2	AC F0		    MOV R4, B
   424:	  02A4	E5 F0		    MOV A, B
   425:	  02A6	7F 0A		    MOV R7, #10D
@@ -496,11 +496,11 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   427:	  02AA	84		    DIV AB
   428:	  02AB	24 30		    ADD A, #30H
   429:	  02AD	F8		    MOV R0, A
-  430:	  02AE	51 F2		    ACALL DISPLAY
+  430:	  02AE	71 06		    ACALL DISPLAY
   431:	  02B0	E5 F0		    MOV A, B
   432:	  02B2	24 30		    ADD A, #30H
   433:	  02B4	F8		    MOV R0, A
-  434:	  02B5	51 F2		    ACALL DISPLAY
+  434:	  02B5	71 06		    ACALL DISPLAY
   435:	  02B7	BD 00 26	    CJNE R5, #00H, DECIMAL
 
 ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 9
@@ -522,11 +522,11 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   446:	  02C5	84		    DIV AB
   447:	  02C6	24 30		    ADD A, #30H
   448:	  02C8	F8		    MOV R0, A
-  449:	  02C9	51 F2		    ACALL DISPLAY
+  449:	  02C9	71 06		    ACALL DISPLAY
   450:	  02CB	E5 F0		    MOV A, B
   451:	  02CD	24 30		    ADD A, #30H
   452:	  02CF	F8		    MOV R0, A
-  453:	  02D0	51 F2		    ACALL DISPLAY
+  453:	  02D0	71 06		    ACALL DISPLAY
   454:	  02D2	BD 00 0B	    CJNE R5, #00H, DECIMAL
   455:	  02D5	22		    RET
   456:
@@ -534,13 +534,13 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   458:	  02D6	EC		    MOV A, R4
   459:	  02D7	24 30		    ADD A, #30H
   460:	  02D9	F8		    MOV R0, A
-  461:	  02DA	51 F2		    ACALL DISPLAY
+  461:	  02DA	71 06		    ACALL DISPLAY
   462:	  02DC	BD 00 01	    CJNE R5, #00H, DECIMAL
   463:	  02DF	22		    RET
   464:
   465:	  02E0			DECIMAL:
   466:	  02E0	78 2E		    MOV R0, #'.'
-  467:	  02E2	51 F2		    ACALL DISPLAY
+  467:	  02E2	71 06		    ACALL DISPLAY
   468:	  02E4	ED		    MOV A, R5
   469:	  02E5	75 F0 0A	    MOV B, #10D
   470:	  02E8	A4		    MUL AB
@@ -548,23 +548,23 @@ ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. 
   472:	  02EB	84		    DIV AB
   473:	  02EC	24 30		    ADD A, #30H
   474:	  02EE	F8		    MOV R0, A
-  475:	  02EF	51 F2		    ACALL DISPLAY
+  475:	  02EF	71 06		    ACALL DISPLAY
   476:	  02F1	22		    RET
-  477:
-  478:				; =================================================================
-  479:				; DRIVER LCD
+  477:				; =================================================================
+  478:				; RUTIN PEMBALIK BIT (BIT REVERSAL)
+  479:				; Memutar urutan bit (D0 jadi D7, D1 jadi D6, dst)
   480:				; =================================================================
-  481:	  02F2			DISPLAY:
-  482:	  02F2	88 90		    MOV LCD_DAT, R0
-  483:	  02F4	D2 B2		    SETB LCD_RS
-  484:	  02F6	D2 B3		    SETB LCD_EN
-  485:	  02F8	71 50		    ACALL DELAY
-  486:	  02FA	C2 B3		    CLR LCD_EN
-  487:	  02FC	22		    RET
-  488:
-  489:	  02FD			COMMAND:
-  490:	  02FD	88 90		    MOV LCD_DAT, R0
-  491:	  02FF	C2 B2		    CLR LCD_RS
+  481:	  02F2			REVERSE_BITS:
+  482:	  02F2	8F 3E		    MOV 3EH, R7         ; Backup R7 ke RAM agar tidak merusak loop teks (OVERFLOW)
+  483:	  02F4	8E 3F		    MOV 3FH, R6         ; Backup R6 ke RAM
+  484:
+  485:	  02F6	7F 08		    MOV R7, #8          ; Lakukan pergeseran sebanyak 8 kali (8-bit)
+  486:	  02F8	7E 00		    MOV R6, #0          ; R6 sebagai penampung data yang sudah dibalik
+  487:	  02FA			REV_LOOP:
+  488:	  02FA	13		    RRC A               ; Geser bit paling kanan (LSB) dari A ke Carry Flag
+  489:	  02FB	CE		    XCH A, R6           ; Tukar nilai A dengan R6 sementara
+  490:	  02FC	33		    RLC A               ; Masukkan Carry Flag tadi ke bit kanan (R6) sambil digeser ke kiri
+  491:	  02FD	CE		    XCH A, R6           ; Tukar kembali
 
 ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 10
 
@@ -572,62 +572,62 @@ ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. H
 
  Line  I  Addr  Code            Source
 
-  492:	  0301	D2 B3		    SETB LCD_EN
-  493:	  0303	71 50		    ACALL DELAY
-  494:	  0305	C2 B3		    CLR LCD_EN
-  495:	  0307	22		    RET
-  496:
-  497:				; =================================================================
-  498:				; INITIALIZATION & DELAY
+  492:	  02FE	DF FA		    DJNZ R7, REV_LOOP   ; Ulangi sampai 8 bit selesai dipindah
+  493:
+  494:	  0300	EE		    MOV A, R6           ; Pindahkan hasil akhir (yang sudah terbalik) ke Akumulator
+  495:	  0301	AF 3E		    MOV R7, 3EH         ; Kembalikan nilai asli R7
+  496:	  0303	AE 3F		    MOV R6, 3FH         ; Kembalikan nilai asli R6
+  497:	  0305	22		    RET
+  498:
   499:				; =================================================================
-  500:	  0308			INITIALYZE:
-  501:	  0308	E4		    CLR A
-  502:	  0309	F8		    MOV R0, A
-  503:	  030A	F9		    MOV R1, A
-  504:	  030B	FA		    MOV R2, A
-  505:	  030C	FB		    MOV R3, A
-  506:	  030D	FC		    MOV R4, A
-  507:	  030E	FD		    MOV R5, A
-  508:	  030F	FE		    MOV R6, A
-  509:	  0310	FF		    MOV R7, A
-  510:
-  511:	  0311	F5 90		    MOV LCD_DAT, A
-  512:	  0313	75 A0 FE	    MOV KEY_PORT, #0FEH
-  513:	  0316	C2 B7		    CLR NOVONUM
-  514:	  0318	C2 B6		    CLR NOVODIG
-  515:	  031A	C2 B5		    CLR ANS_FLAG
-  516:
-  517:	  031C			LCD_INIT:
-  518:	  031C	78 38		    MOV R0,#38H
-  519:	  031E	51 FD		    ACALL COMMAND
-  520:	  0320	78 0E		    MOV R0,#0EH
-  521:	  0322	51 FD		    ACALL COMMAND
-  522:	  0324	78 01		    MOV R0,#01H
-  523:	  0326	51 FD		    ACALL COMMAND
-  524:	  0328	74 06		    MOV A,#06H
-  525:	  032A	51 FD		    ACALL COMMAND
-  526:	  032C	78 80		    MOV R0,#80H
-  527:	  032E	51 FD		    ACALL COMMAND
-  528:	  0330	74 3C		    MOV A,#3CH
-  529:	  0332	51 FD		    ACALL COMMAND
-  530:
-  531:	  0334			STARTUP_MSG:
-  532:	  0334	78 01		    MOV R0, #01H
-  533:	  0336	51 FD		    ACALL COMMAND
-  534:	  0338	90 03 63	    MOV DPTR, #MSG_START
-  535:	  033B			DO_LOOP1:
-  536:	  033B	E4		    CLR A
-  537:	  033C	93		    MOVC A, @A+DPTR
-  538:	  033D	60 08		    JZ EXIT1
-  539:	  033F	F8		    MOV R0, A
-  540:	  0340	51 F2		    ACALL DISPLAY
-  541:	  0342	71 50		    ACALL DELAY
-  542:	  0344	A3		    INC DPTR
-  543:	  0345	80 F4		    SJMP DO_LOOP1
-  544:	  0347			EXIT1:
-  545:	  0347	71 50		    ACALL DELAY
-  546:	  0349	71 50		    ACALL DELAY
-  547:	  034B	78 01		    MOV R0, #01H
+  500:				; DRIVER LCD (Updated dengan Pembalik Bit)
+  501:				; =================================================================
+  502:	  0306			DISPLAY:
+  503:	  0306	E8		    MOV A, R0           ; 1. Ambil data asli dari R0
+  504:	  0307	51 F2		    ACALL REVERSE_BITS  ; 2. Panggil rutin pembalik bit
+  505:	  0309	F5 90		    MOV LCD_DAT, A      ; 3. Kirim data yang SUDAH DIBALIK ke Port 1
+  506:	  030B	D2 B2		    SETB LCD_RS
+  507:	  030D	D2 B3		    SETB LCD_EN
+  508:	  030F	71 6A		    ACALL DELAY
+  509:	  0311	C2 B3		    CLR LCD_EN
+  510:	  0313	22		    RET
+  511:
+  512:	  0314			COMMAND:
+  513:	  0314	E8		    MOV A, R0           ; 1. Ambil instruksi (command) asli dari R0
+  514:	  0315	51 F2		    ACALL REVERSE_BITS  ; 2. Panggil rutin pembalik bit
+  515:	  0317	F5 90		    MOV LCD_DAT, A      ; 3. Kirim instruksi yang SUDAH DIBALIK ke Port 1
+  516:	  0319	C2 B2		    CLR LCD_RS
+  517:	  031B	D2 B3		    SETB LCD_EN
+  518:	  031D	71 6A		    ACALL DELAY
+  519:	  031F	C2 B3		    CLR LCD_EN
+  520:	  0321	22		    RET
+  521:				; =================================================================
+  522:				; INITIALIZATION & DELAY
+  523:				; =================================================================
+  524:	  0322			INITIALYZE:
+  525:	  0322	E4		    CLR A
+  526:	  0323	F8		    MOV R0, A
+  527:	  0324	F9		    MOV R1, A
+  528:	  0325	FA		    MOV R2, A
+  529:	  0326	FB		    MOV R3, A
+  530:	  0327	FC		    MOV R4, A
+  531:	  0328	FD		    MOV R5, A
+  532:	  0329	FE		    MOV R6, A
+  533:	  032A	FF		    MOV R7, A
+  534:
+  535:	  032B	F5 90		    MOV LCD_DAT, A
+  536:	  032D	75 A0 FE	    MOV KEY_PORT, #0FEH
+  537:	  0330	C2 B7		    CLR NOVONUM
+  538:	  0332	C2 B6		    CLR NOVODIG
+  539:	  0334	C2 B5		    CLR ANS_FLAG
+  540:
+  541:	  0336			LCD_INIT:
+  542:	  0336	78 38		    MOV R0,#38H
+  543:	  0338	71 14		    ACALL COMMAND
+  544:	  033A	78 0E		    MOV R0,#0EH
+  545:	  033C	71 14		    ACALL COMMAND
+  546:	  033E	78 01		    MOV R0,#01H
+  547:	  0340	71 14		    ACALL COMMAND
 
 ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 11
 
@@ -635,35 +635,64 @@ ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. H
 
  Line  I  Addr  Code            Source
 
-  548:	  034D	51 FD		    ACALL COMMAND
-  549:	  034F	22		    RET
-  550:
-  551:	  0350	75 3E 02	DELAY:  MOV 62, #2
-  552:	  0353	75 3D 64	DELAY1: MOV 61, #100
-  553:	  0356	75 3C FA	DELAY2: MOV 60, #250
-  554:	  0359	D5 3C FD	        DJNZ 60, $
-  555:	  035C	D5 3D F7	        DJNZ 61, DELAY2
-  556:	  035F	D5 3E F1	        DJNZ 62, DELAY1
-  557:	  0362	22		        RET
-  558:
-  559:				; =================================================================
-  560:				; DATA STRING MESSAGE
-  561:				; =================================================================
-  562:	  0363	42 41 53 49	MSG_START: DB 'BASIC CALCULATOR',0
-	  0367	43 20 43 41
-	  036B	4C 43 55 4C
-	  036F	41 54 4F 52
-	  0373	00
-  563:	  0374	45 52 52 4F	MSG_ERR_0: DB 'ERROR: DIV BY 0',0
-	  0378	52 3A 20 44
-	  037C	49 56 20 42
-	  0380	59 20 30 00
-  564:	  0384	4F 56 45 52	MSG_ERR_1: DB 'OVERFLOW!',0
-	  0388	46 4C 4F 57
-	  038C	21 00
-  565:
-  566:				END
+  548:	  0342	74 06		    MOV A,#06H
+  549:	  0344	71 14		    ACALL COMMAND
+  550:	  0346	78 80		    MOV R0,#80H
+  551:	  0348	71 14		    ACALL COMMAND
+  552:	  034A	74 3C		    MOV A,#3CH
+  553:	  034C	71 14		    ACALL COMMAND
+  554:
+  555:	  034E			STARTUP_MSG:
+  556:	  034E	78 01		    MOV R0, #01H
+  557:	  0350	71 14		    ACALL COMMAND
+  558:	  0352	90 03 7D	    MOV DPTR, #MSG_START
+  559:	  0355			DO_LOOP1:
+  560:	  0355	E4		    CLR A
+  561:	  0356	93		    MOVC A, @A+DPTR
+  562:	  0357	60 08		    JZ EXIT1
+  563:	  0359	F8		    MOV R0, A
+  564:	  035A	71 06		    ACALL DISPLAY
+  565:	  035C	71 6A		    ACALL DELAY
+  566:	  035E	A3		    INC DPTR
+  567:	  035F	80 F4		    SJMP DO_LOOP1
+  568:	  0361			EXIT1:
+  569:	  0361	71 6A		    ACALL DELAY
+  570:	  0363	71 6A		    ACALL DELAY
+  571:	  0365	78 01		    MOV R0, #01H
+  572:	  0367	71 14		    ACALL COMMAND
+  573:	  0369	22		    RET
+  574:
+  575:	  036A	75 3E 02	DELAY:  MOV 62, #2
+  576:	  036D	75 3D 64	DELAY1: MOV 61, #100
+  577:	  0370	75 3C FA	DELAY2: MOV 60, #250
+  578:	  0373	D5 3C FD	        DJNZ 60, $
+  579:	  0376	D5 3D F7	        DJNZ 61, DELAY2
+  580:	  0379	D5 3E F1	        DJNZ 62, DELAY1
+  581:	  037C	22		        RET
+  582:
+  583:				; =================================================================
+  584:				; DATA STRING MESSAGE
+  585:				; =================================================================
+  586:	  037D	42 41 53 49	MSG_START: DB 'BASIC CALCULATOR',0
+	  0381	43 20 43 41
+	  0385	4C 43 55 4C
+	  0389	41 54 4F 52
+	  038D	00
+  587:	  038E	45 52 52 4F	MSG_ERR_0: DB 'ERROR: DIV BY 0',0
+	  0392	52 3A 20 44
+	  0396	49 56 20 42
+	  039A	59 20 30 00
+  588:	  039E	4F 56 45 52	MSG_ERR_1: DB 'OVERFLOW!',0
+	  03A2	46 4C 4F 57
+	  03A6	21 00
+  589:
+  590:				END
 
+
+
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 12
 
 
 
@@ -675,7 +704,7 @@ ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. H
 
 
 
-ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 12
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 13
 
 
 
@@ -706,16 +735,16 @@ COL1				  NUMBER    00A0	  17
 COL2				  NUMBER    00A1	  18
 COL3				  NUMBER    00A2	  19
 COL4				  NUMBER    00A3	  20
-COMMAND				  CODE	    02FD	 489
+COMMAND				  CODE	    0314	 512
 CY				  BIT	      D7
 DECIMAL				  CODE	    02E0	 465
-DELAY				  CODE	    0350	 551
-DELAY1				  CODE	    0353	 552
-DELAY2				  CODE	    0356	 553
-DISPLAY				  CODE	    02F2	 481
+DELAY				  CODE	    036A	 575
+DELAY1				  CODE	    036D	 576
+DELAY2				  CODE	    0370	 577
+DISPLAY				  CODE	    0306	 502
 DIV_BYTES			  CODE	    0253	 361
 DIV_FUNC			  CODE	    01B3	 237
-DO_LOOP1			  CODE	    033B	 535
+DO_LOOP1			  CODE	    0355	 559
 DPH				  DATA	      83
 DPL				  DATA	      82
 EA				  BIT	      AF
@@ -726,7 +755,7 @@ ET0				  BIT	      A9
 ET1				  BIT	      AB
 EX0				  BIT	      A8
 EX1				  BIT	      AA
-EXIT1				  CODE	    0347	 544
+EXIT1				  CODE	    0361	 568
 EXTI0				  CODE	    0003
 EXTI1				  CODE	    0013
 F0				  BIT	      D5
@@ -734,11 +763,11 @@ FIM_ERR				  CODE	    0289	 403
 IE				  DATA	      A8
 IE0				  BIT	      89
 IE1				  BIT	      8B
-INITIALYZE			  CODE	    0308	 500
+INITIALYZE			  CODE	    0322	 524
 INT0				  BIT	      B2
 INT1				  BIT	      B3
 
-ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 13
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 14
 
 
 
@@ -768,13 +797,13 @@ KEY_PORT			  NUMBER    00A0	  16
 L1				  CODE	    0044	  43
 LCD_DAT				  NUMBER    0090	  11
 LCD_EN				  NUMBER    00B3	  13
-LCD_INIT			  CODE	    031C	 517
+LCD_INIT			  CODE	    0336	 541
 LCD_RS				  NUMBER    00B2	  12
 MENOR10				  CODE	    02D6	 457
 MENOR100			  CODE	    02BB	 438
-MSG_ERR_0			  CODE	    0374	 563
-MSG_ERR_1			  CODE	    0384	 564
-MSG_START			  CODE	    0363	 562
+MSG_ERR_0			  CODE	    038E	 587
+MSG_ERR_1			  CODE	    039E	 588
+MSG_START			  CODE	    037D	 586
 MUL_BYTES			  CODE	    0241	 350
 MUL_FUNC			  CODE	    01A7	 230
 NEW_DIGIT			  CODE	    01EE	 285
@@ -801,7 +830,7 @@ P1				  DATA	      90
 P2				  DATA	      A0
 P3				  DATA	      B0
 
-ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 14
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 15
 
 
 
@@ -821,6 +850,8 @@ RD				  BIT	      B7
 REN				  BIT	      9C
 RESET				  CODE	    0000
 RESULT				  CODE	    0225	 329
+REVERSE_BITS			  CODE	    02F2	 481
+REV_LOOP			  CODE	    02FA	 487
 RI				  BIT	      98
 ROW1				  NUMBER    00A4	  21
 ROW2				  NUMBER    00A5	  22
@@ -838,7 +869,7 @@ SM1				  BIT	      9E
 SM2				  BIT	      9D
 SP				  DATA	      81
 START				  CODE	    0040	  36
-STARTUP_MSG			  CODE	    0334	 531
+STARTUP_MSG			  CODE	    034E	 555
 SUB_BYTES			  CODE	    0233	 340
 SUB_FUNC			  CODE	    019B	 223
 T0				  BIT	      B4
