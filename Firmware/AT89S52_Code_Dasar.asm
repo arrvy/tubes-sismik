@@ -859,7 +859,7 @@ DELAY2: MOV 60, #250
 ; =================================================================
 ; DATA STRING MESSAGE
 ; =================================================================
-MSG_START: DB 'BASIC CALCULATOR',0
+MSG_START: DB 'CALC KEL IKHWN ',0
 MSG_ERR_0: DB 'ERROR: DIV BY 0',0
 MSG_ERR_1: DB 'OVERFLOW!',0
 

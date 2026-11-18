@@ -701,7 +701,7 @@ ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. H
   604:				    ; Pengecekan Error Dibagi 0
   605:	  041E	78 C0		    MOV R0, #0C0H
   606:	  0420	12 05 08	    LCALL COMMAND
-  607:	  0423	90 05 A4	    MOV DPTR, #MSG_ERR_0
+  607:	  0423	90 05 A3	    MOV DPTR, #MSG_ERR_0
   608:	  0426	7F 00		    MOV R7, #0D
   609:	  0428			PROX:
   610:	  0428	EF		    MOV A, R7
@@ -715,7 +715,7 @@ ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. H
   618:	  0433			ERRORS:
   619:	  0433	78 C0		    MOV R0, #0C0H
   620:	  0435	12 05 08	    LCALL COMMAND
-  621:	  0438	90 05 B4	    MOV DPTR, #MSG_ERR_1
+  621:	  0438	90 05 B3	    MOV DPTR, #MSG_ERR_1
   622:	  043B	7F 00		    MOV R7, #0D
   623:	  043D			PROX2:
   624:	  043D	EF		    MOV A, R7
@@ -984,18 +984,17 @@ ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. H
   859:				; =================================================================
   860:				; DATA STRING MESSAGE
   861:				; =================================================================
-  862:	  0593	42 41 53 49	MSG_START: DB 'BASIC CALCULATOR',0
-	  0597	43 20 43 41
-	  059B	4C 43 55 4C
-	  059F	41 54 4F 52
-	  05A3	00
-  863:	  05A4	45 52 52 4F	MSG_ERR_0: DB 'ERROR: DIV BY 0',0
-	  05A8	52 3A 20 44
-	  05AC	49 56 20 42
-	  05B0	59 20 30 00
-  864:	  05B4	4F 56 45 52	MSG_ERR_1: DB 'OVERFLOW!',0
-	  05B8	46 4C 4F 57
-	  05BC	21 00
+  862:	  0593	43 41 4C 43	MSG_START: DB 'CALC KEL IKHWN ',0
+	  0597	20 4B 45 4C
+	  059B	20 49 4B 48
+	  059F	57 4E 20 00
+  863:	  05A3	45 52 52 4F	MSG_ERR_0: DB 'ERROR: DIV BY 0',0
+	  05A7	52 3A 20 44
+	  05AB	49 56 20 42
+	  05AF	59 20 30 00
+  864:	  05B3	4F 56 45 52	MSG_ERR_1: DB 'OVERFLOW!',0
+	  05B7	46 4C 4F 57
+	  05BB	21 00
   865:
   866:				END
 
@@ -1006,9 +1005,9 @@ ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. H
                      register banks used:  ---
 
                      no errors
+
 
 ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 17
-
 
 
 
@@ -1133,8 +1132,8 @@ LCD_DAT				  NUMBER    0090	  11
 LCD_EN				  NUMBER    00B3	  13
 LCD_INIT			  CODE	    0540	 817
 LCD_RS				  NUMBER    00B2	  12
-MSG_ERR_0			  CODE	    05A4	 863
-MSG_ERR_1			  CODE	    05B4	 864
+MSG_ERR_0			  CODE	    05A3	 863
+MSG_ERR_1			  CODE	    05B3	 864
 MSG_START			  CODE	    0593	 862
 MUL_BYTES			  CODE	    0387	 511
 MUL_DONE			  CODE	    03BD	 542
