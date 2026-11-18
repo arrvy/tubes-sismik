@@ -286,7 +286,7 @@ OPERATOR:
 SKIP_AUTO_EQ:
     MOV R2, A           
     
-    JNB ANS_FLAG, NORMAL_OP     
+    JNB ANS_FLAG, CHECK_REPLACE_OP     
     
     ; --- LOGIKA CHAINING (BERSIHKAN BARIS 1 & CETAK "ANS") ---
     MOV NUM1_H, RES_H
@@ -326,11 +326,17 @@ CLEAR_REST_LINE1:
     CLR NOVODIG         
     LJMP L1             ; Langsung kembali ke loop utama scanning keypad
 
+CHECK_REPLACE_OP:
+    JNB NOVONUM, NORMAL_OP      ; Jika belum ada operator sebelumnya, langsung cetak normal
+    PUSH 00H                    ; [FIX] Simpan karakter operator baru (R0) di Stack
+    MOV R0, #10H                ; Perintah LCD: Shift Cursor Left
+    LCALL COMMAND
+    POP 00H                     ; [FIX] Ambil kembali karakter operator baru ke R0!
+
 NORMAL_OP:
     SETB NOVONUM        
     CLR NOVODIG         
     RET
-    
 ; =================================================================
 ; KONVERSI ASCII KE DECIMAL (Fix: Menggunakan ANL bukan SUBB)
 ; =================================================================
