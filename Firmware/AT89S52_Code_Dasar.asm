@@ -1,5 +1,5 @@
 ; =================================================================
-; BASIC CALCULATOR 8051 (MODULAR + "ANS" CHAINING FEATURE)
+; BASIC CALCULATOR 8051 (MODULAR + "ANS" CHAINING + DEBOUNCING)
 ; Konfigurasi PINOUT TERBARU:
 ; LCD Data = P1, LCD Ctrl = P3, Keypad = P2
 ; =================================================================
@@ -109,9 +109,15 @@ JUMP_DIVIDE:LJMP DIV_FUNC
 JUMP_EQUAL: LJMP EQU_FUNC
 
 ; =================================================================
-; FUNGSI RESET / CLEAR (ON/C)
+; FUNGSI RESET / CLEAR (ON/C) + FULL DEBOUNCE
 ; =================================================================
 JUMP_RFRESH: 
+    LCALL DEBOUNCE_DELAY        ; Press debounce ~25ms
+    JNB ROW4, WAIT_REL_CLR      ; Jika masih ditekan, lanjut
+    LJMP L1                     ; Jika cuma pantulan, kembali ke L1
+WAIT_REL_CLR:
+    JNB ROW4, WAIT_REL_CLR      ; Tunggu tombol dilepas
+    LCALL DEBOUNCE_DELAY        ; Release debounce ~25ms
     MOV R0, #01H        
     LCALL COMMAND
     MOV R1, #00H        
@@ -131,78 +137,118 @@ JUMP_RFRESH:
     MOV REM_L, #00H
     CLR NOVONUM         
     CLR NOVODIG 
-    CLR ANS_FLAG        ; Reset status ANS
+    CLR ANS_FLAG                ; Reset status ANS
     CLR NUM1_NEG
     CLR RES_NEG
     LJMP L1
 
 ; =================================================================
-; INPUT ANGKA (0-9)
+; INPUT ANGKA (0-9) + PRESS & RELEASE DEBOUNCE
 ; =================================================================
-NUM_0: JNB ROW4, NUM_0
+NUM_0: LCALL DEBOUNCE_DELAY
+       JNB ROW4, WAIT_0
+       LJMP L1
+WAIT_0:JNB ROW4, WAIT_0
+       LCALL DEBOUNCE_DELAY
        LCALL CHECK_NEW_CALC
        MOV R0, #'0'
        LCALL ASCII_2_DEC
        LCALL DISPLAY
        LJMP L1
 
-NUM_1: JNB ROW3, NUM_1          
+NUM_1: LCALL DEBOUNCE_DELAY
+       JNB ROW3, WAIT_1
+       LJMP L1
+WAIT_1:JNB ROW3, WAIT_1          
+       LCALL DEBOUNCE_DELAY
        LCALL CHECK_NEW_CALC
        MOV R0, #'7'             ; Diubah dari '1' menjadi '7'
        LCALL ASCII_2_DEC
        LCALL DISPLAY
        LJMP L1
 
-NUM_2: JNB ROW3, NUM_2
+NUM_2: LCALL DEBOUNCE_DELAY
+       JNB ROW3, WAIT_2
+       LJMP L1
+WAIT_2:JNB ROW3, WAIT_2
+       LCALL DEBOUNCE_DELAY
        LCALL CHECK_NEW_CALC
        MOV R0, #'8'             ; Diubah dari '2' menjadi '8'
        LCALL ASCII_2_DEC
        LCALL DISPLAY
        LJMP L1
 
-NUM_3: JNB ROW3, NUM_3
+NUM_3: LCALL DEBOUNCE_DELAY
+       JNB ROW3, WAIT_3
+       LJMP L1
+WAIT_3:JNB ROW3, WAIT_3
+       LCALL DEBOUNCE_DELAY
        LCALL CHECK_NEW_CALC
        MOV R0, #'9'             ; Diubah dari '3' menjadi '9'
        LCALL ASCII_2_DEC
        LCALL DISPLAY
        LJMP L1
 
-NUM_4: JNB ROW2, NUM_4
+NUM_4: LCALL DEBOUNCE_DELAY
+       JNB ROW2, WAIT_4
+       LJMP L1
+WAIT_4:JNB ROW2, WAIT_4
+       LCALL DEBOUNCE_DELAY
        LCALL CHECK_NEW_CALC
        MOV R0, #'4'
        LCALL ASCII_2_DEC
        LCALL DISPLAY
        LJMP L1
 
-NUM_5: JNB ROW2, NUM_5
+NUM_5: LCALL DEBOUNCE_DELAY
+       JNB ROW2, WAIT_5
+       LJMP L1
+WAIT_5:JNB ROW2, WAIT_5
+       LCALL DEBOUNCE_DELAY
        LCALL CHECK_NEW_CALC
        MOV R0, #'5'
        LCALL ASCII_2_DEC
        LCALL DISPLAY
        LJMP L1
 
-NUM_6: JNB ROW2, NUM_6
+NUM_6: LCALL DEBOUNCE_DELAY
+       JNB ROW2, WAIT_6
+       LJMP L1
+WAIT_6:JNB ROW2, WAIT_6
+       LCALL DEBOUNCE_DELAY
        LCALL CHECK_NEW_CALC
        MOV R0, #'6'
        LCALL ASCII_2_DEC
        LCALL DISPLAY
        LJMP L1
 
-NUM_7: JNB ROW1, NUM_7
+NUM_7: LCALL DEBOUNCE_DELAY
+       JNB ROW1, WAIT_7
+       LJMP L1
+WAIT_7:JNB ROW1, WAIT_7
+       LCALL DEBOUNCE_DELAY
        LCALL CHECK_NEW_CALC
        MOV R0, #'1'             ; Diubah dari '7' menjadi '1'
        LCALL ASCII_2_DEC
        LCALL DISPLAY
        LJMP L1
 
-NUM_8: JNB ROW1, NUM_8   
+NUM_8: LCALL DEBOUNCE_DELAY
+       JNB ROW1, WAIT_8
+       LJMP L1
+WAIT_8:JNB ROW1, WAIT_8   
+       LCALL DEBOUNCE_DELAY
        LCALL CHECK_NEW_CALC
        MOV R0, #'2'             ; Diubah dari '8' menjadi '2'
        LCALL ASCII_2_DEC
        LCALL DISPLAY
        LJMP L1
 
-NUM_9: JNB ROW1, NUM_9
+NUM_9: LCALL DEBOUNCE_DELAY
+       JNB ROW1, WAIT_9
+       LJMP L1
+WAIT_9:JNB ROW1, WAIT_9
+       LCALL DEBOUNCE_DELAY
        LCALL CHECK_NEW_CALC
        MOV R0, #'3'             ; Diubah dari '9' menjadi '3'
        LCALL ASCII_2_DEC       
@@ -238,36 +284,61 @@ CHECK_END:
     RET
 
 ; =================================================================
-; INPUT OPERATOR & SAMA DENGAN
+; INPUT OPERATOR & SAMA DENGAN + PRESS & RELEASE DEBOUNCE
 ; =================================================================
 EQU_FUNC:
-    JNB ROW4, EQU_FUNC
+    LCALL DEBOUNCE_DELAY
+    JNB ROW4, WAIT_EQU
+    LJMP L1
+WAIT_EQU:
+    JNB ROW4, WAIT_EQU
+    LCALL DEBOUNCE_DELAY
     LCALL RESULT        
     LJMP L1
 
 ADD_FUNC: 
-    JNB ROW4, ADD_FUNC
+    LCALL DEBOUNCE_DELAY
+    JNB ROW4, WAIT_ADD
+    LJMP L1
+WAIT_ADD:
+    JNB ROW4, WAIT_ADD
+    LCALL DEBOUNCE_DELAY
     MOV R0, #'+'
     LCALL OPERATOR      
     LCALL DISPLAY
     LJMP L1
 
 SUB_FUNC:
-    JNB ROW3, SUB_FUNC
+    LCALL DEBOUNCE_DELAY
+    JNB ROW3, WAIT_SUB
+    LJMP L1
+WAIT_SUB:
+    JNB ROW3, WAIT_SUB
+    LCALL DEBOUNCE_DELAY
     MOV R0, #'-'
     LCALL OPERATOR      
     LCALL DISPLAY
     LJMP L1
 
 MUL_FUNC:
-    JNB ROW2, MUL_FUNC
+    LCALL DEBOUNCE_DELAY
+    JNB ROW2, WAIT_MUL
+    LJMP L1
+WAIT_MUL:
+    JNB ROW2, WAIT_MUL
+    LCALL DEBOUNCE_DELAY
     MOV R0, #'*'
     LCALL OPERATOR      
     LCALL DISPLAY
     LJMP L1
 
 DIV_FUNC:
-    JNB ROW1, DIV_FUNC
+    LCALL DEBOUNCE_DELAY
+    JNB ROW1, WAIT_DIV
+    LJMP L1
+WAIT_DIV:
+    JNB ROW1, WAIT_DIV
+    LCALL DEBOUNCE_DELAY
     MOV R0, #'/'
     LCALL OPERATOR      
     LCALL DISPLAY
@@ -297,7 +368,7 @@ SKIP_AUTO_EQ:
     MOV NUM2_L, #00H
     CLR ANS_FLAG        
     
-    MOV R0, #80H        ; Pindah ke awal baris 1
+    MOV R0, #80H                ; Pindah ke awal baris 1
     LCALL COMMAND
     
     MOV R0, #'A'
@@ -307,44 +378,45 @@ SKIP_AUTO_EQ:
     MOV R0, #'S'
     LCALL DISPLAY
     
-    MOV A, R2           ; Cetak operator langsung setelah 'S'
+    MOV A, R2                   ; Cetak operator langsung setelah 'S'
     MOV R0, A
     LCALL DISPLAY
     
-    MOV R7, #12D        ; Bersihkan sisa 12 kolom di kanan baris 1
+    MOV R7, #12D                ; Bersihkan sisa 12 kolom di kanan baris 1
 CLEAR_REST_LINE1:
     MOV R0, #' '
     LCALL DISPLAY
     DJNZ R7, CLEAR_REST_LINE1
     
-    MOV R0, #84H        ; Kembalikan kursor tepat setelah "ANS+" (kolom ke-5 baris 1)
+    MOV R0, #84H                ; Kembalikan kursor tepat setelah "ANS+" (kolom ke-5 baris 1)
     LCALL COMMAND
     
-    POP ACC             ; Hapus alamat return ke ADD_FUNC/SUB_FUNC/MUL_FUNC/DIV_FUNC
-    POP ACC             ; agar tidak mencetak operator dua kali
+    POP ACC                     ; Hapus alamat return ke ADD_FUNC/SUB_FUNC/MUL_FUNC/DIV_FUNC
+    POP ACC                     ; agar tidak mencetak operator dua kali
     SETB NOVONUM        
     CLR NOVODIG         
-    LJMP L1             ; Langsung kembali ke loop utama scanning keypad
+    LJMP L1                     ; Langsung kembali ke loop utama scanning keypad
 
 CHECK_REPLACE_OP:
     JNB NOVONUM, NORMAL_OP      ; Jika belum ada operator sebelumnya, langsung cetak normal
-    PUSH 00H                    ; [FIX] Simpan karakter operator baru (R0) di Stack
+    PUSH 00H                    ; Simpan karakter operator baru (R0) di Stack
     MOV R0, #10H                ; Perintah LCD: Shift Cursor Left
     LCALL COMMAND
-    POP 00H                     ; [FIX] Ambil kembali karakter operator baru ke R0!
+    POP 00H                     ; Ambil kembali karakter operator baru ke R0
 
 NORMAL_OP:
     SETB NOVONUM        
     CLR NOVODIG         
     RET
+
 ; =================================================================
-; KONVERSI ASCII KE DECIMAL (Fix: Menggunakan ANL bukan SUBB)
+; KONVERSI ASCII KE DECIMAL
 ; =================================================================
 ASCII_2_DEC:
     JB NOVONUM, SECOND_NUMBER   
     JB NOVODIG, NEW_DIGIT       
     MOV A, R0
-    ANL A, #0FH         ; Lebih stabil dari SUBB A, #30H
+    ANL A, #0FH         
     MOV NUM1_H, #00H
     MOV NUM1_L, A           
     SETB NOVODIG        
@@ -447,13 +519,13 @@ RESULT:
 
 ADD_BYTES:
     CJNE R2, #'+', SUB_BYTES
-    JB NUM1_NEG, JUMP_MAG_SUB   ; Gunakan LJMP wrapper agar tidak Out of Range
+    JB NUM1_NEG, JUMP_MAG_SUB   
     CLR F0                      ; F0 = 0 (tanda hasil tambah positif)
     LJMP DO_MAG_ADD
 
 SUB_BYTES:
     CJNE R2, #'-', MUL_BYTES
-    JNB NUM1_NEG, JUMP_MAG_SUB  ; Gunakan LJMP wrapper agar tidak Out of Range
+    JNB NUM1_NEG, JUMP_MAG_SUB  
     SETB F0                     ; Jika (-NUM1) - NUM2 -> -(NUM1 + NUM2)
     LJMP DO_MAG_ADD
 
@@ -468,7 +540,7 @@ DO_MAG_ADD:
     MOV RES_L, A
     MOV A, NUM1_H
     ADDC A, NUM2_H
-    JC JUMP_RES_ERR             ; Trampoline lokal agar tidak Out of Range
+    JC JUMP_RES_ERR             
     MOV RES_H, A
     MOV C, F0
     MOV RES_NEG, C
@@ -526,7 +598,7 @@ MUL_LOOP:
     MOV RES_L, A
     MOV A, RES_H
     ADDC A, NUM1_H
-    JC JUMP_RES_ERR             ; Trampoline lokal agar tidak Out of Range
+    JC JUMP_RES_ERR             
     MOV RES_H, A
     MOV R4, RES_H
     MOV R5, RES_L
@@ -545,7 +617,7 @@ MUL_DONE:
 DIV_BYTES:
     MOV A, NUM2_H
     ORL A, NUM2_L
-    JNZ DIV_START               ; Inverted branch + LJMP agar tidak Out of Range
+    JNZ DIV_START               
     LJMP DIV_ZERO_ERR
 DIV_START:
     MOV RES_H, #00H
@@ -574,7 +646,6 @@ DIV_DONE:
 
 ; --- Validasi Akhir Rentang -1024 s/d +1023 ---
 CHECK_RES_RANGE:
-    ; Jika hasil == 0 (dan sisa == 0), paksa tanda menjadi positif agar tidak tampil "-0"
     MOV A, RES_H
     ORL A, RES_L
     ORL A, REM_H
@@ -601,7 +672,6 @@ TO_PRINT:
     JNZ NORMAL
 
 DIV_ZERO_ERR:
-    ; Pengecekan Error Dibagi 0
     MOV R0, #0C0H
     LCALL COMMAND
     MOV DPTR, #MSG_ERR_0
@@ -609,7 +679,7 @@ DIV_ZERO_ERR:
 PROX:   
     MOV A, R7
     MOVC A, @A+DPTR
-    JZ FIM_ERR          ; Fix BUG: Pengecekan dilakukan sebelum display!
+    JZ FIM_ERR          
     MOV R0, A
     LCALL DISPLAY
     INC R7
@@ -623,14 +693,14 @@ ERRORS:
 PROX2:  
     MOV A, R7
     MOVC A, @A+DPTR
-    JZ FIM_ERR          ; Fix BUG: Pengecekan dilakukan sebelum display!
+    JZ FIM_ERR          
     MOV R0, A
     LCALL DISPLAY
     INC R7
     SJMP PROX2
     
 FIM_ERR:
-    SETB ANS_FLAG       ; Set agar kalau user tekan angka baru, layar me-refresh
+    SETB ANS_FLAG       
     RET
 
 NORMAL: 
@@ -740,6 +810,7 @@ DEC_PRINT:
     MOV R0, A
     LCALL DISPLAY       
     RET
+
 ; =================================================================
 ; RUTIN PEMBALIK BIT (BIT REVERSAL) 
 ; Memutar urutan bit (D0 jadi D7, D1 jadi D6, dst)
@@ -784,8 +855,9 @@ COMMAND:
     LCALL DELAY
     CLR LCD_EN
     RET
+
 ; =================================================================
-; INITIALIZATION & DELAY
+; INITIALIZATION & DELAY (TERMASUK DEBOUNCE DELAY ~25ms)
 ; =================================================================
 INITIALYZE:
     CLR A               
@@ -848,12 +920,21 @@ EXIT1:
     LCALL COMMAND           
     RET
 
+; --- Delay Standar LCD (~50ms pada 11.0592MHz) ---
 DELAY:  MOV 62, #2          
 DELAY1: MOV 61, #100
 DELAY2: MOV 60, #250
         DJNZ 60, $
         DJNZ 61, DELAY2
         DJNZ 62, DELAY1
+        RET
+
+; --- Delay Khusus Debouncing Tombol (~25ms pada 11.0592MHz) ---
+DEBOUNCE_DELAY:
+        MOV 63, #50
+DEB_L1: MOV 64, #250
+        DJNZ 64, $
+        DJNZ 63, DEB_L1
         RET
 
 ; =================================================================
